@@ -23,11 +23,11 @@ const ramp = (t, a, b) => { const k = clamp((t - a) / (b - a || 1e-9), 0, 1); re
 /* ---------------- harmonia ----------------
    Um acorde a cada 8 s, quinze ao todo: nada de mudança brusca. */
 const ACORDES = [
-  { nome: 'Am9',  notas: [57, 60, 64, 71], baixo: 33, mel: [72, 76, 79, 84, 88] },
-  { nome: 'Fmaj7',notas: [53, 57, 60, 64], baixo: 29, mel: [72, 77, 81, 84, 89] },
-  { nome: 'Cmaj9',notas: [48, 52, 55, 62], baixo: 36, mel: [74, 76, 79, 83, 86] },
-  { nome: 'G6',   notas: [47, 50, 55, 64], baixo: 31, mel: [74, 78, 79, 83, 86] },
-  { nome: 'Dm9',  notas: [50, 57, 60, 65], baixo: 26, mel: [72, 77, 79, 84, 88] }
+  { nome: 'Am9',  notas: [57, 60, 64, 71], baixo: 45, mel: [72, 76, 79, 84, 88] },
+  { nome: 'Fmaj7',notas: [53, 57, 60, 64], baixo: 41, mel: [72, 77, 81, 84, 89] },
+  { nome: 'Cmaj9',notas: [48, 52, 55, 62], baixo: 48, mel: [74, 76, 79, 83, 86] },
+  { nome: 'G6',   notas: [47, 50, 55, 64], baixo: 43, mel: [74, 78, 79, 83, 86] },
+  { nome: 'Dm9',  notas: [50, 57, 60, 65], baixo: 38, mel: [72, 77, 79, 84, 88] }
 ];
 const ORDEM = [0, 1, 2, 3, 0, 1, 4, 3, 2, 0, 1, 3, 2, 1, 0];
 const BLOCO = 8;                       /* segundos por acorde */
@@ -68,7 +68,7 @@ function sino(t0, freq, ganho, pan) {
     const atk = 1 - Math.exp(-t * 420);
     let s = 0;
     for (let p = 0; p < parc.length; p++) s += pesos[p] * Math.exp(-t * decai[p] * 1.55) * Math.sin(2 * Math.PI * freq * parc[p] * t);
-    const a = s * atk * ganho * .5;
+    const a = s * atk * ganho * .72;
     L[i] += a * (1 - pan * .45);
     R[i] += a * (1 + pan * .45);
   }
@@ -114,9 +114,9 @@ for (let b = 0; b < nBlocos; b++) {
   const corpo = lerp(.42, 1, ramp(b * BLOCO, 4, 26));
   ac.notas.forEach((n, j) => {
     const pan = (j - 1.5) / 3;
-    almofada(t0, dur, mtof(n), .085 * corpo * (j === 3 ? .7 : 1), pan);
+    almofada(t0, dur, mtof(n), .072 * corpo * (j === 3 ? .7 : 1), pan);
   });
-  baixo(t0, dur, mtof(ac.baixo), .10 * corpo);
+  baixo(t0, dur, mtof(ac.baixo), .085 * corpo);
 }
 
 /* melodia: só entra quando o filme começa a explicar (cena 02 em diante) */
@@ -143,7 +143,7 @@ for (let b = 0; b < nBlocos; b++) {
     if ((t > 77 && t < 93) || t > 104) if (k % 3 === 1) nota += 12;
     const abre = ramp(t, MEL_INI, MEL_INI + 3.5);
     const fecha = 1 - ramp(t, DUR - 7, DUR - 1.5);
-    const g = .19 * abre * fecha * (k % 2 === 0 ? 1 : .78);
+    const g = .30 * abre * fecha * (k % 2 === 0 ? 1 : .78);
     const pan = ((k % 3) - 1) * .5;
     if (g <= 0) continue;
     sino(t, mtof(nota), g, pan);
@@ -161,7 +161,7 @@ ar(.030);
 /* ---------------- sala (reverberação Schroeder simples) ---------------- */
 function reverb(buf, offset) {
   const combs = [1557, 1617, 1491, 1422, 1277, 1116].map(d => d + offset);
-  const fb = [.84, .835, .83, .825, .82, .815];
+  const fb = [.80, .795, .79, .785, .78, .775];
   const out = new Float64Array(N);
   for (let c = 0; c < combs.length; c++) {
     const d = combs[c], lin = new Float64Array(d);
@@ -169,7 +169,7 @@ function reverb(buf, offset) {
     for (let i = 0; i < N; i++) {
       const y = lin[idx];
       out[i] += y;
-      filt = y * .28 + filt * .72;           /* abafa a cauda, para não sibilar */
+      filt = y * .34 + filt * .66;           /* abafa a cauda, para não sibilar */
       lin[idx] = buf[i] + filt * fb[c];
       if (++idx >= d) idx = 0;
     }
@@ -200,8 +200,8 @@ let pico = 0, xL = 0, yL = 0, xR = 0, yR = 0;
 for (let i = 0; i < N; i++) {
   const t = i / SR;
   /* bloqueador de corrente contínua: a realimentação da sala empurra o zero */
-  yL = L[i] - xL + .9985 * yL; xL = L[i];
-  yR = R[i] - xR + .9985 * yR; xR = R[i];
+  yL = L[i] - xL + .9950 * yL; xL = L[i];
+  yR = R[i] - xR + .9950 * yR; xR = R[i];
   const env = Math.min(ramp(t, 0, 2.6), 1 - ramp(t, DUR - 4.2, DUR - .15));
   L[i] = Math.tanh(yL * 1.25 * env) * .92;
   R[i] = Math.tanh(yR * 1.25 * env) * .92;
