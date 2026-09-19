@@ -1,9 +1,9 @@
 # Ateliê Digital — vídeo "como funciona"
 
-Peça de vídeo (1920×1080, 30 qps, 2 min) que explica, função por função, o que o
-**Ateliê Digital** faz: o problema do link da bio, os cinco controles da mesa de
-montagem, os modelos prontos, o briefing que vai para o WhatsApp, a origem das
-cores no Atlas Cromático e os três degraus de oferta.
+Peça de vídeo (1920×1080, 30 qps, 2 min e 10 s) que explica, função por função, o
+que o **Ateliê Digital** faz: o problema do link da bio, os cinco controles da
+mesa de montagem, os modelos prontos, o briefing que vai para o WhatsApp, o
+estudo de tendências de onde saem as cores e os três degraus de oferta.
 
 Tudo é feito em JavaScript, sem banco de imagens e sem trilha licenciada:
 
@@ -20,13 +20,13 @@ Tudo é feito em JavaScript, sem banco de imagens e sem trilha licenciada:
 
 ```bash
 npm install
-npm run video        # trilha + quadros + montagem, ~11 min
+npm run video        # trilha + quadros + montagem, ~12 min
 ```
 
 Ou por etapa:
 
 ```bash
-npm run music        # out/trilha.wav  (120 s, estéreo, 16 bits)
+npm run music        # out/trilha.wav  (130,5 s, estéreo, 16 bits)
 npm run frames       # renderiza e monta out/atelie-digital-como-funciona.mp4
 ```
 
@@ -58,9 +58,10 @@ Ver no navegador: abra `src/index.html?play` (roda em laço) ou
 | 08 | O que entra na home — os seis blocos, ligando e desligando | 67,0 s | 10,5 s |
 | 09 | Modelos prontos — oito, por tipo de loja | 77,5 s | 8,5 s |
 | 10 | Briefing no WhatsApp — escrito pela página e enviado | 86,0 s | 11,0 s |
-| 11 | De onde vêm as cores — os números do Atlas Cromático | 97,0 s | 7,5 s |
-| 12 | Três degraus — página, identidade, acompanhamento | 104,5 s | 8,5 s |
-| — | Fechamento — convite para abrir a mesa de montagem | 113,0 s | 7,0 s |
+| 11 | De onde vêm as cores — as três etapas do estudo de tendências | 97,0 s | 9,5 s |
+| 12 | A carta da temporada — os números e os tons batizados | 106,5 s | 8,5 s |
+| 13 | Três degraus — página, identidade, acompanhamento | 115,0 s | 8,5 s |
+| — | Fechamento — convite para abrir a mesa de montagem | 123,5 s | 7,0 s |
 
 As cenas 03 a 08 usam a mesma composição, nas mesmas coordenadas: com a
 dissolvência de 1,1 s entre elas, a sequência lê como um plano só, com a câmera
@@ -89,6 +90,9 @@ soma as durações sozinha, e a trilha aceita o novo total em
   montagem; o @ e o telefone ficam fora da tela, para irem na DM junto com o link.
 - **Cores nomeadas.** Só os nove tons da carta Outono-Inverno 26/27 que já estão
   medidos aparecem com nome e código; o restante da carta entra como número.
+- **O estudo aparece sem nome próprio.** As cenas 11 e 12 explicam o método —
+  marcas acompanhadas, cor lida no código, o que se repete vira movimento — e
+  fecham na carta da temporada, sem citar o nome do levantamento.
 
 ## Créditos técnicos
 

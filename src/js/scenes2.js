@@ -40,7 +40,7 @@
   /* ---------- 05 · cor da marca ---------- */
   S.list.push(S.mesaScene({
     id: 'cor', num: '05', label: 'Cor da marca', dur: 11.5, foco: 'cor',
-    caption: 'A cor vem em quatro grupos — e cada tom foi medido no código de uma marca de verdade.',
+    caption: 'A cor vem em quatro grupos, e cada tom saiu de um estudo de tendências — não de um chute.',
     evs: [
       { t: 1.4, ctrl: 'grupo', i: 1 }, { t: 2.5, ctrl: 'cor', i: 1 },
       { t: 4.6, ctrl: 'grupo', i: 2 }, { t: 5.7, ctrl: 'cor', i: 3 },
@@ -209,13 +209,112 @@
     }
   });
 
-  /* ---------- 11 · de onde vêm as cores ---------- */
+  /* ---------- 11 · como as cores são escolhidas ---------- */
   S.list.push({
-    id: 'atlas', num: '11', label: 'De onde vêm as cores', dur: 7.5,
-    caption: 'As cores saíram do Atlas Cromático: medidas no código dos sites, não no olho.',
+    id: 'estudo', num: '11', label: 'De onde vêm as cores', dur: 9.5,
+    caption: 'As cores não são chute: saem de um estudo de tendências que acompanha o que as marcas estão usando.',
     build(s) {
-      const n = put(s, 'div', 'nums');
-      Object.assign(n.style, { left: '0', top: '206px' });
+      const cores = [].concat(...DATA.grupos.map(g => g.cores));
+      const passos = [
+        { n: '01', t: 'As marcas', d: 'Vinte e oito marcas de moda acompanhadas temporada a temporada, das grandes às de ateliê.' },
+        { n: '02', t: 'A cor de verdade', d: 'O tom é lido direto do código do site — o valor exato que a marca usa, não o que a foto faz parecer.' },
+        { n: '03', t: 'O que se repete', d: 'Os tons que aparecem em muitas marcas ao mesmo tempo viram um movimento. Dezoito, nesta temporada.' }
+      ];
+      s._p = passos.map((x, i) => {
+        const c = put(s, 'div', 'passo');
+        Object.assign(c.style, { left: (110 + i * 600) + 'px', top: '214px' });
+        put(c, 'div', 'n', x.n);
+        const cx = put(c, 'div', 'cx');
+        put(c, 'div', 't', x.t);
+        put(c, 'div', 'd', x.d);
+        c._cx = cx;
+        return c;
+      });
+
+      /* 01 — seis sites em miniatura, cada um na sua cor */
+      const g = put(s._p[0]._cx, 'div', 'minis');
+      s._minis = [0, 5, 8, 11, 2, 13].map(k => {
+        const cor = cores[k].hex;
+        const m = put(g, 'div', 'mini');
+        const b = put(m, 'div', 'b'); put(b, 'i'); put(b, 'i'); put(b, 'i');
+        const cc = put(m, 'div', 'c');
+        const l1 = put(cc, 'div', 'l'); l1.style.background = cor; l1.style.width = '64%';
+        const l2 = put(cc, 'div', 'l'); l2.style.background = UI.mix('#ffffff', cor, .35); l2.style.width = '88%';
+        const l3 = put(cc, 'div', 'l'); l3.style.background = UI.mix('#ffffff', cor, .22); l3.style.width = '46%';
+        return m;
+      });
+
+      /* 02 — o tom saindo do código da página */
+      const cod = put(s._p[1]._cx, 'div', 'codigo');
+      s._lupa = put(s._p[1]._cx, 'div', 'lupa');
+      s._lupa.style.top = '82px';
+      cod.innerHTML = ':root {<br>&nbsp;&nbsp;--fundo: #faf7f1;<br>' +
+        '&nbsp;&nbsp;--marca: <b id="hexlido"></b><br>&nbsp;&nbsp;--texto: #171614;<br>}';
+      s._hex = cod.querySelector('#hexlido');
+      s._alvo = '#c08a78;';
+
+      /* 03 — os tons se juntando em famílias */
+      const nv = put(s._p[2]._cx, 'div', 'nuvem');
+      const grupos = [
+        { base: '#c08a78', cx: 118, cy: 96, r: 62 },
+        { base: '#3e8a80', cx: 300, cy: 74, r: 52 },
+        { base: '#5b3a78', cx: 232, cy: 188, r: 50 }
+      ];
+      s._pts = [];
+      grupos.forEach((gr, gi) => {
+        for (let k = 0; k < 7; k++) {
+          const a = (k / 7) * Math.PI * 2 + gi * 1.1;
+          const d = gr.r * (.28 + .72 * ((k * 37) % 11) / 11);
+          const pt = put(nv, 'div', 'pt');
+          const tam = 15 + ((k * 23) % 9);
+          Object.assign(pt.style, {
+            width: tam + 'px', height: tam + 'px',
+            left: (gr.cx + Math.cos(a) * d - tam / 2) + 'px',
+            top: (gr.cy + Math.sin(a) * d - tam / 2) + 'px',
+            background: k % 2 ? UI.mix(gr.base, '#ffffff', .10 + k * .04) : UI.mix(gr.base, '#171614', k * .03)
+          });
+          s._pts.push({ el: pt, gi, k });
+        }
+      });
+      s._anel = put(nv, 'div', 'anel');
+      Object.assign(s._anel.style, { left: '36px', top: '14px', width: '164px', height: '164px' });
+      s._capa = put(nv, 'div', 'cap', 'movimento');
+      Object.assign(s._capa.style, { left: '70px', top: '186px' });
+    },
+    update(s, t) {
+      s._p.forEach((c, i) => {
+        const a = .25 + i * .55;
+        const k = F.outQuint(F.span(t, a, a + 1.0));
+        c.style.opacity = k;
+        c.style.transform = `translateY(${(1 - k) * 26}px)`;
+      });
+      /* 01 */
+      S.rise(s._minis, t, 1.0, .09, .7, 14);
+      /* 02 — o código sendo lido, caractere a caractere */
+      const n = Math.floor(F.clamp(F.span(t, 2.3, 3.5)) * s._alvo.length);
+      const txt = s._alvo.slice(0, n);
+      s._hex.innerHTML = n >= s._alvo.length
+        ? `<span class="chip" style="background:#c08a78"></span>${txt}` : txt;
+      s._lupa.style.opacity = F.pulse(t, 2.1, 5.2, .5) * .9;
+      /* 03 — os pontos aparecem e uma família se fecha */
+      s._pts.forEach(p => {
+        const a = 3.0 + p.gi * .35 + p.k * .055;
+        const k = F.outQuint(F.span(t, a, a + .5));
+        p.el.style.opacity = k;
+        p.el.style.transform = `scale(${.4 + .6 * k})`;
+      });
+      s._anel.style.opacity = F.outQuint(F.span(t, 5.4, 6.1)) * .75;
+      S.fade(s._capa, F.span(t, 5.8, 6.4));
+    }
+  });
+
+  /* ---------- 12 · a carta da temporada ---------- */
+  S.list.push({
+    id: 'carta', num: '12', label: 'A carta da temporada', dur: 8.5,
+    caption: 'O estudo fecha numa carta de quinze tons — é ela que abastece a lista do controle Cor da marca.',
+    build(s) {
+      const n = put(s, 'div', 'nums pq');
+      Object.assign(n.style, { left: '0', top: '196px' });
       s._n = DATA.numeros.map(x => {
         const d = put(n, 'div', 'num');
         const v = put(d, 'div', 'n', '0');
@@ -223,35 +322,38 @@
         return { v, alvo: parseInt(x.n, 10), el: d };
       });
       const tons = put(s, 'div', 'tons');
-      Object.assign(tons.style, { left: '205px', top: '536px' });
+      Object.assign(tons.style, { left: '205px', top: '470px' });
       const nomeados = [].concat(...DATA.grupos.map(g => g.cores))
         .filter(c => ['Muted Clay', 'Terracota', 'Red Mahogany', 'Bordô', 'Marinho', 'Púrpura',
                       'Acacia', 'Chartreuse', 'Neptune Green'].includes(c.nome));
       s._t = nomeados.map(c => {
         const d = put(tons, 'div', 'ton');
-        const sw = put(d, 'div', 'sw'); sw.style.background = c.hex;
+        const sw = put(d, 'div', 'sw'); sw.style.background = c.hex; sw.style.height = '178px';
         put(d, 'div', 'nm', c.nome);
         put(d, 'div', 'hx', c.hex);
         return d;
       });
-      s._leg = put(s, 'div', 'kicker', 'Carta Outono-Inverno 26/27 · 15 tons');
-      Object.assign(s._leg.style, { position: 'absolute', left: '205px', top: '494px', opacity: 0 });
+      s._leg = put(s, 'div', 'kicker', 'Carta Outono-Inverno 26/27 · 15 tons, 9 já batizados');
+      Object.assign(s._leg.style, { position: 'absolute', left: '205px', top: '428px', opacity: 0 });
+      s._elo = put(s, 'div', 'elo', 'os mesmos tons que aparecem lá na Cor da marca');
+      Object.assign(s._elo.style, { left: '205px', top: '806px', opacity: 0 });
     },
     update(s, t) {
       s._n.forEach((x, i) => {
-        const a = .2 + i * .2;
-        const k = F.outQuint(F.span(t, a, a + 1.5));
+        const a = .2 + i * .18;
+        const k = F.outQuint(F.span(t, a, a + 1.3));
         x.el.style.opacity = F.clamp(k * 2);
         x.v.textContent = Math.round(k * x.alvo);
       });
-      S.fade(s._leg, F.span(t, 1.8, 2.5));
-      S.rise(s._t, t, 2.0, .10, .9, 30);
+      S.fade(s._leg, F.span(t, 1.6, 2.3));
+      S.rise(s._t, t, 1.8, .09, .9, 28);
+      S.fade(s._elo, F.span(t, 4.6, 5.4));
     }
   });
 
   /* ---------- 12 · três degraus ---------- */
   S.list.push({
-    id: 'degraus', num: '12', label: 'Três degraus', dur: 8.5,
+    id: 'degraus', num: '13', label: 'Três degraus', dur: 8.5,
     caption: 'Começa pela página que vende. Depois a marca inteira. Depois o acompanhamento.',
     build(s) {
       s._c = DATA.degraus.map((d, i) => {

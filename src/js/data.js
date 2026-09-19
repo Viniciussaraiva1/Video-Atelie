@@ -24,7 +24,7 @@ const DATA = {
   ],
 
   /* CONTROLE 2 — Cor da marca, nos grupos do site.
-     Os tons nomeados vêm da carta Outono-Inverno 26/27 do Atlas Cromático. */
+     Os tons nomeados vêm da carta Outono-Inverno 26/27 do estudo de tendências. */
   grupos: [
     { grupo: 'Terrosos', cores: [
       { nome: 'Muted Clay', hex: '#c08a78' }, { nome: 'Terracota', hex: '#b5644a' },
@@ -101,10 +101,10 @@ const DATA = {
     'Vitrine inicial: 12 peças'
   ],
 
-  /* números do Atlas Cromático que sustentam as escolhas de cor */
+  /* números do estudo de tendências que sustentam as escolhas de cor */
   numeros: [
-    { n: '28',  t: 'marcas medidas' },
-    { n: '109', t: 'cores lidas no código dos sites' },
+    { n: '28',  t: 'marcas acompanhadas' },
+    { n: '109', t: 'cores lidas no código' },
     { n: '18',  t: 'movimentos de tendência' },
     { n: '15',  t: 'tons na carta 26/27' }
   ],

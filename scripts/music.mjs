@@ -21,15 +21,16 @@ const lerp = (a, b, k) => a + (b - a) * k;
 const ramp = (t, a, b) => { const k = clamp((t - a) / (b - a || 1e-9), 0, 1); return k * k * (3 - 2 * k); };
 
 /* ---------------- harmonia ----------------
-   Um acorde a cada 8 s, quinze ao todo: nada de mudança brusca. */
+   Um acorde a cada 8 s. Centro em dó maior, começando e terminando
+   resolvido: o menor entra só de passagem, para não pesar. */
 const ACORDES = [
-  { nome: 'Am9',  notas: [57, 60, 64, 71], baixo: 45, mel: [72, 76, 79, 84, 88] },
-  { nome: 'Fmaj7',notas: [53, 57, 60, 64], baixo: 41, mel: [72, 77, 81, 84, 89] },
-  { nome: 'Cmaj9',notas: [48, 52, 55, 62], baixo: 48, mel: [74, 76, 79, 83, 86] },
-  { nome: 'G6',   notas: [47, 50, 55, 64], baixo: 43, mel: [74, 78, 79, 83, 86] },
-  { nome: 'Dm9',  notas: [50, 57, 60, 65], baixo: 38, mel: [72, 77, 79, 84, 88] }
+  { nome: 'Cmaj9', notas: [52, 55, 59, 62], baixo: 48, mel: [67, 69, 72, 76, 79] },
+  { nome: 'Fmaj9', notas: [53, 57, 60, 64], baixo: 41, mel: [67, 69, 72, 77, 81] },
+  { nome: 'G6/9',  notas: [50, 55, 59, 64], baixo: 43, mel: [67, 71, 74, 76, 79] },
+  { nome: 'Am7',   notas: [52, 57, 60, 64], baixo: 45, mel: [69, 72, 76, 79, 81] },
+  { nome: 'Dm7',   notas: [53, 57, 62, 65], baixo: 50, mel: [69, 72, 74, 77, 81] }
 ];
-const ORDEM = [0, 1, 2, 3, 0, 1, 4, 3, 2, 0, 1, 3, 2, 1, 0];
+const ORDEM = [0, 1, 2, 0, 1, 3, 2, 0, 1, 2, 4, 1, 2, 3, 1, 0, 0];
 const BLOCO = 8;                       /* segundos por acorde */
 const nBlocos = Math.ceil(DUR / BLOCO);
 
@@ -40,7 +41,7 @@ function almofada(t0, dur, freq, ganho, pan) {
   const ini = Math.floor(t0 * SR), fim = Math.min(N, Math.floor((t0 + dur) * SR));
   const atk = 2.2, rel = 3.4;
   const det = [1, 1.0016, 0.9986, 2.0008];      /* a quarta voz é a oitava acima */
-  const pesos = [1, .62, .55, .18];
+  const pesos = [1, .62, .55, .25];
   for (let i = ini; i < fim; i++) {
     const t = (i - ini) / SR;
     const env = Math.min(ramp(t, 0, atk), 1 - ramp(t, dur - rel, dur));
@@ -61,13 +62,13 @@ function sino(t0, freq, ganho, pan) {
   const ini = Math.floor(t0 * SR);
   const dur = 2.6, fim = Math.min(N, ini + Math.floor(dur * SR));
   const parc = [1, 2.01, 3.03, 4.17, 5.43];
-  const pesos = [1, .44, .26, .13, .07];
-  const decai = [1.0, 1.7, 2.3, 3.1, 4.0];
+  const pesos = [1, .38, .16, .05, .015];
+  const decai = [1.0, 1.6, 2.2, 3.0, 3.8];
   for (let i = ini; i < fim; i++) {
     const t = (i - ini) / SR;
     const atk = 1 - Math.exp(-t * 420);
     let s = 0;
-    for (let p = 0; p < parc.length; p++) s += pesos[p] * Math.exp(-t * decai[p] * 1.55) * Math.sin(2 * Math.PI * freq * parc[p] * t);
+    for (let p = 0; p < parc.length; p++) s += pesos[p] * Math.exp(-t * decai[p] * 1.30) * Math.sin(2 * Math.PI * freq * parc[p] * t);
     const a = s * atk * ganho * .72;
     L[i] += a * (1 - pan * .45);
     R[i] += a * (1 + pan * .45);
@@ -161,7 +162,7 @@ ar(.030);
 /* ---------------- sala (reverberação Schroeder simples) ---------------- */
 function reverb(buf, offset) {
   const combs = [1557, 1617, 1491, 1422, 1277, 1116].map(d => d + offset);
-  const fb = [.80, .795, .79, .785, .78, .775];
+  const fb = [.74, .735, .73, .725, .72, .715];
   const out = new Float64Array(N);
   for (let c = 0; c < combs.length; c++) {
     const d = combs[c], lin = new Float64Array(d);
@@ -169,7 +170,7 @@ function reverb(buf, offset) {
     for (let i = 0; i < N; i++) {
       const y = lin[idx];
       out[i] += y;
-      filt = y * .34 + filt * .66;           /* abafa a cauda, para não sibilar */
+      filt = y * .40 + filt * .60;           /* abafa a cauda, para não sibilar */
       lin[idx] = buf[i] + filt * fb[c];
       if (++idx >= d) idx = 0;
     }
@@ -189,7 +190,7 @@ function reverb(buf, offset) {
 }
 
 const wetL = reverb(L, 0), wetR = reverb(R, 23);
-const WET = .30;
+const WET = .20;
 for (let i = 0; i < N; i++) {
   L[i] = L[i] * (1 - WET * .45) + wetL[i] * WET;
   R[i] = R[i] * (1 - WET * .45) + wetR[i] * WET;
@@ -207,7 +208,7 @@ for (let i = 0; i < N; i++) {
   R[i] = Math.tanh(yR * 1.25 * env) * .92;
   pico = Math.max(pico, Math.abs(L[i]), Math.abs(R[i]));
 }
-const norm = pico > 0 ? .89 / pico : 1;
+const norm = pico > 0 ? .50 / pico : 1;
 
 /* ---------------- arquivo WAV ---------------- */
 const bytes = N * 4;
