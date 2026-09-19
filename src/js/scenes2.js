@@ -122,11 +122,10 @@
         return t;
       });
       s._cur = UI.cursor(s);
-      s._nota = put(s, 'div', 'note', 'escolhido — a mesa já abre montada assim.');
-      Object.assign(s._nota.style, { left: '110px', top: '918px', width: '700px', opacity: 0 });
+      s._nota = put(s, 'div', 'kicker', 'Escolhido — a mesa já abre montada assim');
+      Object.assign(s._nota.style, { position: 'absolute', left: '110px', top: '880px', opacity: 0 });
     },
     update(s, t) {
-      S.rise(s._th, t, .25, .11, .9, 26);
       const passeio = [3, 5, 1, 0];
       const pts = passeio.map((idx, i) => {
         const q = pt(s._th[idx]);
@@ -137,11 +136,15 @@
       const tc = 2.4 + 3 * .95 + .2;
       const alvo = pt(s._th[0]);
       s._cur.click(t, tc, alvo.x + 40, alvo.y - 10, 16);
+      /* entrada em cascata e destaque do escolhido no mesmo transform */
       s._th.forEach((n, i) => {
+        const a = .25 + i * .11;
+        const sobe = F.outQuint(F.span(t, a, a + .9));
+        n.style.opacity = sobe;
         const on = (i === 0 && t >= tc);
         n._sel.style.opacity = on ? F.out(F.span(t, tc, tc + .4)) : 0;
         const k = on ? F.out(F.span(t, tc, tc + .5)) : 0;
-        n.style.transform = `translateY(${n.style.transform.includes('translateY') && t < 1.5 ? 0 : 0}px) scale(${1 + k * .02})`;
+        n.style.transform = `translateY(${(1 - sobe) * 26}px) scale(${1 + k * .02})`;
       });
       S.fade(s._nota, F.span(t, tc + .3, tc + 1.1));
     }
