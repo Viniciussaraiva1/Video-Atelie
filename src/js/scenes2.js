@@ -351,14 +351,148 @@
     }
   });
 
-  /* ---------- 12 · três degraus ---------- */
+  /* ---------- 13 · radar de compras ---------- */
+  const COR = { desce: '#3e8a80', sobe: '#b5644a', igual: 'rgba(23,22,20,.38)' };
+
+  /* Linha do preço semana a semana. A faixa vertical é a da própria série,
+     mas nunca menor que 14% do preço: assim preço parado desenha linha reta
+     em vez de virar serra por causa de dois reais de diferença. */
+  const spark = r => {
+    const W = 300, H = 46, v = r.serie;
+    const mn = Math.min(...v), mx = Math.max(...v), meio = (mn + mx) / 2;
+    const amp = Math.max(mx - mn, meio * .14), pe = meio - amp / 2;
+    const P = v.map((n, i) => [
+      +(5 + i / (v.length - 1) * (W - 10)).toFixed(1),
+      +(H - 7 - (n - pe) / amp * (H - 14)).toFixed(1)
+    ]);
+    const z = P[P.length - 1];
+    return `<svg viewBox="0 0 ${W} ${H}">
+      <path class="l" d="M${P.map(p => p[0] + ' ' + p[1]).join(' L ')}" fill="none"
+        stroke="${COR[r.dir]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${z[0]}" cy="${z[1]}" r="4.2" fill="${COR[r.dir]}" opacity="0"/></svg>`;
+  };
+
   S.list.push({
-    id: 'degraus', num: '13', label: 'Três degraus', dur: 8.5,
-    caption: 'Começa pela página que vende. Depois a marca inteira. Depois o acompanhamento.',
+    id: 'radar', num: '13', label: 'Radar de compras', dur: 12.5,
+    caption: 'O mesmo estudo olha para o outro lado do balcão: o preço do que você compra, as ofertas e fornecedores novos.',
+    build(s) {
+      const C = DATA.compras;
+
+      const p = put(s, 'div', 'radar');
+      Object.assign(p.style, { left: '110px', top: '206px', width: '1020px' });
+      put(p, 'div', 'h', 'O que a sua loja compra · oito semanas de preço');
+      /* a varredura vem antes das linhas para que a última delas continue
+         sendo o último div do painel, e perca a borda de baixo */
+      s._scan = put(p, 'div', 'scan');
+      s._r = C.radar.map(r => {
+        const row = put(p, 'div', 'rrow');
+        const id = put(row, 'div', 'id');
+        put(id, 'div', 'pc', r.peca);
+        put(id, 'div', 'fo', `${r.forn} · ${r.seg}`);
+        const sp = put(row, 'div', 'spark', spark(r));
+        const vr = put(row, 'div', 'vr', r.vr);
+        vr.style.color = COR[r.dir];
+        const linha = sp.querySelector('path.l');
+        const len = linha.getTotalLength();
+        linha.style.strokeDasharray = len;
+        return { el: row, vr, linha, len, ponto: sp.querySelector('circle') };
+      });
+      s._p = p;
+
+      /* ofertas encontradas */
+      const A = put(s, 'div', 'achado');
+      Object.assign(A.style, { left: '1210px', top: '206px', width: '600px' });
+      put(A, 'div', 'h', 'Ofertas da semana');
+      s._of = C.ofertas.map(o => {
+        const row = put(A, 'div', 'arow');
+        put(row, 'div', 't', o.peca);
+        put(row, 'div', 's', o.forn);
+        const pr = put(row, 'div', 'p');
+        put(pr, 'span', 'de', o.de);
+        put(pr, 'span', 'por', o.por);
+        const ec = put(pr, 'span', 'ec', '');
+        put(row, 'div', 's', o.nota).style.marginTop = '10px';
+        return { el: row, ec, ganho: o.ganho };
+      });
+      s._A = A;
+
+      /* fornecedores novos */
+      const B = put(s, 'div', 'achado');
+      Object.assign(B.style, { left: '1210px', top: '578px', width: '600px' });
+      put(B, 'div', 'h', 'Fornecedores novos');
+      s._nv = C.novos.map(n => {
+        const row = put(B, 'div', 'arow');
+        put(row, 'div', 't', n.nome);
+        put(row, 'div', 's', `${n.seg} · ${n.cidade}`);
+        put(row, 'div', 's', n.cond).style.marginTop = '10px';
+        return row;
+      });
+      s._B = B;
+
+      s._elo = put(s, 'div', 'elo', 'toda semana, sem você ter que procurar');
+      Object.assign(s._elo.style, { left: '1210px', top: '900px', opacity: 0 });
+    },
+    update(s, t) {
+      const kp = F.outQuint(F.span(t, .15, 1.4));
+      s._p.style.opacity = kp;
+      s._p.style.transform = `translateY(${(1 - kp) * 24}px)`;
+
+      /* as linhas de preço sendo desenhadas, uma abaixo da outra */
+      const n = s._r.length;
+      s._r.forEach((r, i) => {
+        const a = .9 + i * .30;
+        const k = F.outQuint(F.span(t, a, a + .9));
+        r.el.style.opacity = k;
+        r.el.style.transform = `translateY(${(1 - k) * 16}px)`;
+        const kl = F.ease(F.span(t, a + .25, a + 1.25));
+        r.linha.style.strokeDashoffset = r.len * (1 - kl);
+        r.ponto.style.opacity = F.span(t, a + 1.15, a + 1.45);
+      });
+
+      /* a varredura desce pela lista e a variação de cada peça aparece atrás dela */
+      const y0 = s._r[0].el.offsetTop, y1 = s._r[n - 1].el.offsetTop;
+      const kv = F.smooth(F.span(t, 3.3, 5.6));
+      Object.assign(s._scan.style, {
+        top: F.lerp(y0, y1, kv) + 'px',
+        height: s._r[0].el.offsetHeight + 'px',
+        opacity: F.pulse(t, 3.2, 6.0, .35) * .9
+      });
+      s._r.forEach((r, i) => {
+        const tr = 3.3 + (i / (n - 1)) * 2.3 + .2;
+        r.vr.style.opacity = F.span(t, tr, tr + .45);
+      });
+
+      /* as ofertas: a economia do lote é contada no lugar */
+      const ka = F.outQuint(F.span(t, 5.5, 6.7));
+      s._A.style.opacity = ka;
+      s._A.style.transform = `translateY(${(1 - ka) * 22}px)`;
+      s._of.forEach((o, i) => {
+        const a = 5.8 + i * .55;
+        const k = F.outQuint(F.span(t, a, a + .9));
+        o.el.style.opacity = k;
+        o.el.style.transform = `translateY(${(1 - k) * 14}px)`;
+        const kc = F.ease(F.span(t, a + .5, a + 1.5));
+        o.ec.textContent = kc > 0 ? `−R$ ${Math.round(kc * o.ganho)} no lote` : '';
+        o.ec.style.opacity = F.span(t, a + .5, a + .8);
+      });
+
+      const kb = F.outQuint(F.span(t, 8.1, 9.3));
+      s._B.style.opacity = kb;
+      s._B.style.transform = `translateY(${(1 - kb) * 22}px)`;
+      S.rise(s._nv, t, 8.4, .55, .9, 14);
+
+      S.fade(s._elo, F.span(t, 10.3, 11.1));
+    }
+  });
+
+  /* ---------- 14 · três degraus ---------- */
+  S.list.push({
+    id: 'degraus', num: '14', label: 'Três degraus', dur: 10.5,
+    caption: 'Começa pela página que vende, depois a marca inteira. O estudo de cores e o radar de compras andam por fora, todo mês.',
     build(s) {
       s._c = DATA.degraus.map((d, i) => {
         const c = put(s, 'div', 'step');
-        Object.assign(c.style, { left: (110 + i * 580) + 'px', top: (438 - i * 74) + 'px' });
+        Object.assign(c.style, { left: (110 + i * 580) + 'px', top: (390 - i * 74) + 'px' });
         put(c, 'div', 'n', d.n);
         const bar = put(c, 'div', 'bar');
         bar.style.marginTop = '20px';
@@ -367,6 +501,20 @@
         c._bar = bar;
         return c;
       });
+      const ad = put(s, 'div', 'adic');
+      s._ln = put(ad, 'div', 'ln');
+      s._k = put(ad, 'div', 'kicker', 'Serviço adicional · assinatura mensal');
+      s._k.style.marginTop = '24px';
+      const g = put(ad, 'div', 'g');
+      s._it = DATA.adicional.map(x => {
+        const it = put(g, 'div', 'it');
+        put(it, 'i').style.background = x.c;
+        const cx = put(it, 'div');
+        put(cx, 'div', 't', x.t);
+        put(cx, 'div', 'd', x.d);
+        return it;
+      });
+      s._ad = ad;
     },
     update(s, t) {
       s._c.forEach((c, i) => {
@@ -376,6 +524,9 @@
         c.style.transform = `translateY(${(1 - k) * 28}px)`;
         c._bar.style.width = (F.ease(F.span(t, a + .35, a + 1.5)) * 498) + 'px';
       });
+      s._ln.style.width = (F.ease(F.span(t, 3.4, 4.8)) * 1700) + 'px';
+      S.fade(s._k, F.span(t, 4.2, 5.0));
+      S.rise(s._it, t, 4.8, .55, 1.0, 20);
     }
   });
 

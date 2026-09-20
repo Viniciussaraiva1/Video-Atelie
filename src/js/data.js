@@ -101,6 +101,35 @@ const DATA = {
     'Vitrine inicial: 12 peças'
   ],
 
+  /* acompanhamento de compras: o que a loja compra, ofertas e fornecedores novos.
+     Os preços são por peça ou por metro, lidos semana a semana. */
+  compras: {
+    radar: [
+      { peca: 'Vestido midi em viscose', seg: 'Malharia',    forn: 'Atacado Vila Nova',
+        serie: [68, 70, 69, 66, 67, 63, 61, 60], vr: '−12%', dir: 'desce' },
+      { peca: 'Alfaiataria em lã fria',  seg: 'Alfaiataria', forn: 'Lanifício Trentino',
+        serie: [82, 81, 83, 84, 83, 86, 86, 87], vr: '+6%',  dir: 'sobe' },
+      { peca: 'Linho tinto em peça',     seg: 'Tecelagem',   forn: 'Tecidos Aurora',
+        serie: [51, 52, 50, 49, 50, 48, 47, 47], vr: '−8%',  dir: 'desce' },
+      { peca: 'Casaco de lã batida',     seg: 'Inverno',     forn: 'Malharia São Bento',
+        serie: [96, 95, 97, 96, 95, 96, 97, 96], vr: 'igual', dir: 'igual' },
+      { peca: 'Aviamentos e botões',     seg: 'Aviamentos',  forn: 'Casa Marfim',
+        serie: [34, 33, 31, 30, 28, 27, 27, 27], vr: '−21%', dir: 'desce' }
+    ],
+    ofertas: [
+      { peca: 'Vestido midi em viscose', forn: 'Atacado Vila Nova',
+        de: 'R$ 68', por: 'R$ 60', nota: 'lote de 20 peças · até sexta', ganho: 160 },
+      { peca: 'Aviamentos e botões', forn: 'Casa Marfim',
+        de: 'R$ 34', por: 'R$ 27', nota: 'pedido fechado do mês', ganho: 210 }
+    ],
+    novos: [
+      { nome: 'Tecelagem Brandão', seg: 'Linho e algodão tinto',
+        cidade: 'Blumenau · SC', cond: 'mínimo 15 m · entrega em 6 dias' },
+      { nome: 'Fio Nobre', seg: 'Forros e entretelas',
+        cidade: 'Americana · SP', cond: 'mínimo 10 m · entrega em 4 dias' }
+    ]
+  },
+
   /* números do estudo de tendências que sustentam as escolhas de cor */
   numeros: [
     { n: '28',  t: 'marcas acompanhadas' },
@@ -114,5 +143,13 @@ const DATA = {
     { n: '01', t: 'Página de venda',   d: 'A vitrine no ar, com as peças, os preços e o botão do WhatsApp.' },
     { n: '02', t: 'Identidade e site', d: 'A cara da marca inteira: cores, letra, fotos e as páginas de dentro.' },
     { n: '03', t: 'Acompanhamento',    d: 'Troca de coleção, leitura dos números e ajuste do que não converte.' }
+  ],
+
+  /* assinatura mensal que anda junto: o estudo e o radar de compras */
+  adicional: [
+    { t: 'Cartela de cores e tendências', c: '#c08a78',
+      d: 'A carta da temporada refeita a cada estação, abastecendo a lista da mesa.' },
+    { t: 'Radar de compras', c: '#3e8a80',
+      d: 'O preço do que você compra, as ofertas da semana e fornecedores novos.' }
   ]
 };

@@ -1,7 +1,11 @@
 /* ---------------------------------------------------------------
    Renderiza o filme quadro a quadro. Cada quadro é um seek(t) na
    página e uma foto da tela; as fotos vão direto para o ffmpeg por
-   um cano, sem encostar no disco. O áudio entra na mesma passada.
+   um cano, sem encostar no disco.
+
+   O filme sai mudo, com uma faixa de áudio silenciosa: sem faixa
+   nenhuma, alguns aplicativos (o envio do Instagram entre eles)
+   engasgam. Para pôr uma trilha depois, use scripts/mux.mjs.
    uso: node scripts/render.mjs [fps] [saída.mp4]
 ----------------------------------------------------------------*/
 import { chromium } from 'playwright';
@@ -15,10 +19,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const raiz = path.join(dir, '..');
 const FPS = Number(process.argv[2] || 30);
 const SAIDA = path.join(raiz, 'out', process.argv[3] || 'atelie-digital-como-funciona.mp4');
-const TRILHA = path.join(raiz, 'out', 'trilha.wav');
 const EXEC = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
-
-if (!fs.existsSync(TRILHA)) { console.error('Falta a trilha. Rode: npm run music'); process.exit(1); }
 
 const nav = await chromium.launch({
   executablePath: EXEC,
@@ -39,11 +40,11 @@ console.log(`filme: ${DUR}s · ${FPS} qps · trecho ${DE}–${ATE}s · ${TOTAL} 
 const ff = spawn(ffmpeg, [
   '-y', '-hide_banner', '-loglevel', 'error',
   '-f', 'image2pipe', '-vcodec', 'png', '-framerate', String(FPS), '-i', 'pipe:0',
-  '-ss', String(DE), '-i', TRILHA,
+  '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo',
   '-map', '0:v', '-map', '1:a',
   '-c:v', 'libx264', '-preset', 'slow', '-crf', '18',
   '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.2',
-  '-c:a', 'aac', '-b:a', '192k', '-ar', '44100',
+  '-c:a', 'aac', '-b:a', '48k', '-ar', '44100',
   '-movflags', '+faststart', '-shortest', SAIDA
 ], { stdio: ['pipe', 'inherit', 'inherit'] });
 

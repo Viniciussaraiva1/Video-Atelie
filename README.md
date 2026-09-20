@@ -1,33 +1,36 @@
 # Ateliê Digital — vídeo "como funciona"
 
-Peça de vídeo (1920×1080, 30 qps, 2 min e 10 s) que explica, função por função, o
+Peça de vídeo (1920×1080, 30 qps, 2 min e 25 s) que explica, função por função, o
 que o **Ateliê Digital** faz: o problema do link da bio, os cinco controles da
 mesa de montagem, os modelos prontos, o briefing que vai para o WhatsApp, o
-estudo de tendências de onde saem as cores e os três degraus de oferta.
+estudo de tendências de onde saem as cores, o radar de compras e os degraus de
+oferta.
 
-Tudo é feito em JavaScript, sem banco de imagens e sem trilha licenciada:
+Tudo é feito em JavaScript, sem banco de imagens:
 
 - **imagem** — uma página HTML animada, desenhada em CSS e SVG (os croquis de moda
   são caminhos vetoriais escritos à mão em `src/js/draw.js`);
 - **movimento** — uma linha do tempo determinística: `seek(t)` desenha o quadro
   exato do instante `t`, sem depender de relógio ou de `requestAnimationFrame`;
-- **som** — trilha sintetizada por soma de senoides em JavaScript puro
-  (`scripts/music.mjs`), ambiente e sem percussão;
+- **som** — o filme sai mudo, com uma faixa silenciosa (sem faixa nenhuma, o envio
+  do Instagram engasga). A trilha sintetizada por soma de senoides continua no
+  repositório, em `scripts/music.mjs`, e entra depois com `scripts/mux.mjs`;
 - **montagem** — Playwright fotografa quadro a quadro e joga tudo num cano para o
-  ffmpeg, que fecha o MP4 com o áudio na mesma passada.
+  ffmpeg, que fecha o MP4 na mesma passada.
 
 ## Como gerar o vídeo
 
 ```bash
 npm install
-npm run video        # trilha + quadros + montagem, ~12 min
+npm run video        # renderiza e monta out/atelie-digital-como-funciona.mp4, ~10 min
 ```
 
-Ou por etapa:
+Para pôr uma trilha no filme já renderizado, sem refazer os quadros:
 
 ```bash
-npm run music        # out/trilha.wav  (130,5 s, estéreo, 16 bits)
-npm run frames       # renderiza e monta out/atelie-digital-como-funciona.mp4
+npm run music                 # out/trilha.wav — peça o total em segundos: node scripts/music.mjs 145
+node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha.wav
+node scripts/mux.mjs atelie-digital-como-funciona.mp4 mudo     # tira de volta
 ```
 
 Conferir um trecho sem esperar o filme todo:
@@ -60,8 +63,9 @@ Ver no navegador: abra `src/index.html?play` (roda em laço) ou
 | 10 | Briefing no WhatsApp — escrito pela página e enviado | 86,0 s | 11,0 s |
 | 11 | De onde vêm as cores — as três etapas do estudo de tendências | 97,0 s | 9,5 s |
 | 12 | A carta da temporada — os números e os tons batizados | 106,5 s | 8,5 s |
-| 13 | Três degraus — página, identidade, acompanhamento | 115,0 s | 8,5 s |
-| — | Fechamento — convite para abrir a mesa de montagem | 123,5 s | 7,0 s |
+| 13 | Radar de compras — preço do que a loja compra, ofertas, fornecedores novos | 115,0 s | 12,5 s |
+| 14 | Três degraus — página, identidade, acompanhamento, mais o adicional | 127,5 s | 10,5 s |
+| — | Fechamento — convite para abrir a mesa de montagem | 138,0 s | 7,0 s |
 
 As cenas 03 a 08 usam a mesma composição, nas mesmas coordenadas: com a
 dissolvência de 1,1 s entre elas, a sequência lê como um plano só, com a câmera
@@ -93,6 +97,14 @@ soma as durações sozinha, e a trilha aceita o novo total em
 - **O estudo aparece sem nome próprio.** As cenas 11 e 12 explicam o método —
   marcas acompanhadas, cor lida no código, o que se repete vira movimento — e
   fecham na carta da temporada, sem citar o nome do levantamento.
+- **O radar de compras é o mesmo estudo virado para o outro lado.** A cena 13
+  mostra o serviço adicional: o preço do que a loja compra semana a semana, as
+  ofertas achadas e fornecedores novos. Peças, fornecedores e preços são
+  fictícios, como as boutiques. A linha de preço usa a faixa da própria série,
+  com piso de 14 % — preço parado desenha linha reta, e não serra.
+- **O adicional é vendido junto com as cores.** A cena 14 mantém os três degraus
+  e põe embaixo, numa faixa à parte, a assinatura mensal: cartela de cores e
+  tendências mais radar de compras.
 
 ## Créditos técnicos
 
