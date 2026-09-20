@@ -1,8 +1,10 @@
 /* ---------------------------------------------------------------
-   Trilha sonora sintetizada em JavaScript puro — sem biblioteca,
-   sem amostra de banco. Ambiente, sem percussão: acordes longos,
-   melodia de caixinha de música com eco, baixo grave e um fundo
-   de ar. Saída: out/trilha.wav (44,1 kHz, estéreo, 16 bits).
+   Trilha lo-fi sintetizada em JavaScript puro — sem biblioteca e
+   sem amostra de banco. Piano elétrico abafado, baixo redondo, uma
+   batida quase só sentida, ondulação de fita e chiado de vinil.
+   Feita para ficar embaixo da imagem: nada aqui pede atenção.
+   Saída: out/trilha.wav (44,1 kHz, estéreo, 16 bits).
+   uso: node scripts/music.mjs [segundos]
 ----------------------------------------------------------------*/
 import fs from 'fs';
 import path from 'path';
@@ -10,159 +12,177 @@ import { fileURLToPath } from 'url';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const SR = 44100;
-const DUR = Number(process.argv[2] || 120);
+const DUR = Number(process.argv[2] || 145);
 const N = Math.ceil(DUR * SR);
 
 const L = new Float64Array(N), R = new Float64Array(N);
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
-const lerp = (a, b, k) => a + (b - a) * k;
 /* rampa suave entre dois instantes */
 const ramp = (t, a, b) => { const k = clamp((t - a) / (b - a || 1e-9), 0, 1); return k * k * (3 - 2 * k); };
+/* sorteio determinístico: mesma semente, mesmo arquivo, sempre */
+const rng = s => () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x3fffffff - 1; };
+
+/* ---------------- andamento ----------------
+   72 batidas por minuto: passo de quem anda devagar. */
+const BPM = 72;
+const BAT = 60 / BPM;
+const COMPASSO = 4 * BAT;
+const BLOCO = 2 * COMPASSO;              /* um acorde a cada dois compassos */
+const nBlocos = Math.ceil(DUR / BLOCO);
 
 /* ---------------- harmonia ----------------
-   Um acorde a cada 8 s. Centro em dó maior, começando e terminando
-   resolvido: o menor entra só de passagem, para não pesar. */
+   Roda de jazz em dó maior, com sétimas e nonas: o menor só passa,
+   nunca fecha. As vozes ficam todas em volta do dó central, onde o
+   piano elétrico é redondo, e o baixo nunca desce do mi grave. */
 const ACORDES = [
-  { nome: 'Cmaj9', notas: [52, 55, 59, 62], baixo: 48, mel: [67, 69, 72, 76, 79] },
-  { nome: 'Fmaj9', notas: [53, 57, 60, 64], baixo: 41, mel: [67, 69, 72, 77, 81] },
-  { nome: 'G6/9',  notas: [50, 55, 59, 64], baixo: 43, mel: [67, 71, 74, 76, 79] },
-  { nome: 'Am7',   notas: [52, 57, 60, 64], baixo: 45, mel: [69, 72, 76, 79, 81] },
-  { nome: 'Dm7',   notas: [53, 57, 62, 65], baixo: 50, mel: [69, 72, 74, 77, 81] }
+  { nome: 'Cmaj9',  baixo: 48, notas: [64, 67, 71, 74], mel: [79, 76, 74] },
+  { nome: 'Am11',   baixo: 45, notas: [64, 67, 72, 74], mel: [76, 74, 72] },
+  { nome: 'Dm9',    baixo: 50, notas: [65, 69, 72, 76], mel: [81, 77, 74] },
+  { nome: 'G13',    baixo: 43, notas: [65, 69, 71, 76], mel: [79, 76, 74] },
+  { nome: 'Fmaj9',  baixo: 41, notas: [64, 67, 72, 76], mel: [81, 79, 76] },
+  { nome: 'Em7',    baixo: 40, notas: [62, 67, 71, 74], mel: [79, 74, 71] },
+  { nome: 'Dm7',    baixo: 50, notas: [65, 69, 72, 77], mel: [77, 74, 72] },
+  { nome: 'G9sus',  baixo: 43, notas: [65, 67, 72, 74], mel: [79, 77, 74] }
 ];
-const ORDEM = [0, 1, 2, 0, 1, 3, 2, 0, 1, 2, 4, 1, 2, 3, 1, 0, 0];
-const BLOCO = 8;                       /* segundos por acorde */
-const nBlocos = Math.ceil(DUR / BLOCO);
+const ORDEM = [0, 1, 2, 3, 4, 1, 2, 3, 0, 5, 6, 7, 4, 3, 1, 0];
 
 /* ---------------- vozes ---------------- */
 
-/* almofada: senoides levemente desafinadas entre si, ataque e queda longos */
-function almofada(t0, dur, freq, ganho, pan) {
-  const ini = Math.floor(t0 * SR), fim = Math.min(N, Math.floor((t0 + dur) * SR));
-  const atk = 2.2, rel = 3.4;
-  const det = [1, 1.0016, 0.9986, 2.0008];      /* a quarta voz é a oitava acima */
-  const pesos = [1, .62, .55, .25];
-  for (let i = ini; i < fim; i++) {
-    const t = (i - ini) / SR;
-    const env = Math.min(ramp(t, 0, atk), 1 - ramp(t, dur - rel, dur));
-    if (env <= 0) continue;
-    /* respiração lenta, para o acorde nunca ficar parado */
-    const resp = 1 + .07 * Math.sin(2 * Math.PI * (.055 * t + pan));
-    let s = 0;
-    for (let d = 0; d < det.length; d++) s += pesos[d] * Math.sin(2 * Math.PI * freq * det[d] * (t + pan * .01));
-    s /= 2.35;
-    const a = s * env * ganho * resp;
-    L[i] += a * (1 - .35 * pan);
-    R[i] += a * (1 + .35 * pan - .35);
-  }
-}
-
-/* caixinha de música: sino de decaimento rápido, com parciais fora da série */
-function sino(t0, freq, ganho, pan) {
+/* piano elétrico: fundamental gorda, um harmônico de sino que morre
+   rápido e o trêmulo lento que todo Rhodes tem */
+function rhodes(t0, freq, g, pan, dur = 4.2) {
   const ini = Math.floor(t0 * SR);
-  const dur = 2.6, fim = Math.min(N, ini + Math.floor(dur * SR));
-  const parc = [1, 2.01, 3.03, 4.17, 5.43];
-  const pesos = [1, .38, .16, .05, .015];
-  const decai = [1.0, 1.6, 2.2, 3.0, 3.8];
+  if (ini >= N || g <= 0) return;
+  const fim = Math.min(N, ini + Math.floor(dur * SR));
+  const parc  = [1, 2, 3, 4.02, 6.01, 9.4];
+  const pesos = [1, .30, .12, .055, .022, .009];
+  const dec   = [.52, .95, 1.5, 2.2, 3.4, 6.2];
+  const det = 1 + pan * .0009;                  /* os lados quase afinados entre si */
   for (let i = ini; i < fim; i++) {
     const t = (i - ini) / SR;
-    const atk = 1 - Math.exp(-t * 420);
+    const atk = 1 - Math.exp(-t * 240);
     let s = 0;
-    for (let p = 0; p < parc.length; p++) s += pesos[p] * Math.exp(-t * decai[p] * 1.30) * Math.sin(2 * Math.PI * freq * parc[p] * t);
-    const a = s * atk * ganho * .72;
-    L[i] += a * (1 - pan * .45);
-    R[i] += a * (1 + pan * .45);
+    for (let p = 0; p < parc.length; p++)
+      s += pesos[p] * Math.exp(-t * dec[p]) * Math.sin(2 * Math.PI * freq * parc[p] * det * t);
+    const trem = 1 + .10 * Math.sin(2 * Math.PI * 4.6 * t + pan * 2);
+    const a = s * atk * trem * g * .50;
+    L[i] += a * (1 - pan * .40);
+    R[i] += a * (1 + pan * .40);
   }
 }
 
-/* baixo: senoide grave com um harmônico tímido */
-function baixo(t0, dur, freq, ganho) {
-  const ini = Math.floor(t0 * SR), fim = Math.min(N, Math.floor((t0 + dur) * SR));
+/* baixo: senoide redonda com dois harmônicos tímidos, sem ataque duro */
+function baixo(t0, freq, g, dur = 3.0) {
+  const ini = Math.floor(t0 * SR);
+  if (ini >= N || g <= 0) return;
+  const fim = Math.min(N, ini + Math.floor(dur * SR));
   for (let i = ini; i < fim; i++) {
     const t = (i - ini) / SR;
-    const env = Math.min(ramp(t, 0, 2.4), 1 - ramp(t, dur - 3.0, dur));
-    if (env <= 0) continue;
-    const s = Math.sin(2 * Math.PI * freq * t) + .16 * Math.sin(4 * Math.PI * freq * t);
-    const a = s * env * ganho * (1 + .05 * Math.sin(2 * Math.PI * .08 * t));
+    const env = (1 - Math.exp(-t * 70)) * Math.exp(-t * 1.00);
+    const s = Math.sin(2 * Math.PI * freq * t)
+            + .17 * Math.sin(4 * Math.PI * freq * t)
+            + .05 * Math.sin(6 * Math.PI * freq * t);
+    const a = s * env * g;
     L[i] += a; R[i] += a;
   }
 }
 
-/* fundo de ar: ruído filtrado, bem embaixo de tudo */
-function ar(ganho) {
-  let z1L = 0, z2L = 0, z1R = 0, z2R = 0, seed = 12345;
-  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x3fffffff - 1; };
-  const c = .018;   /* corte grave */
-  for (let i = 0; i < N; i++) {
-    const t = i / SR;
-    const mod = .55 + .45 * Math.sin(2 * Math.PI * .037 * t) * Math.sin(2 * Math.PI * .011 * t + 1.1);
-    z1L += c * (rnd() - z1L); z2L += c * (z1L - z2L);
-    z1R += c * (rnd() - z1R); z2R += c * (z1R - z2R);
-    const env = Math.min(ramp(t, 0, 6), 1 - ramp(t, DUR - 6, DUR));
-    L[i] += z2L * ganho * mod * env * 8;
-    R[i] += z2R * ganho * mod * env * 8;
+/* bumbo: altura despencando, mais peito que estalo */
+function bumbo(t0, g) {
+  const ini = Math.floor(t0 * SR);
+  if (ini >= N || g <= 0) return;
+  const fim = Math.min(N, ini + Math.floor(.52 * SR));
+  let ph = 0;
+  for (let i = ini; i < fim; i++) {
+    const t = (i - ini) / SR;
+    ph += 2 * Math.PI * (46 + 64 * Math.exp(-t * 32)) / SR;
+    const env = Math.exp(-t * 9.0) * (1 - Math.exp(-t * 700));
+    const a = Math.sin(ph) * env * g;
+    L[i] += a; R[i] += a;
+  }
+}
+
+/* escova e aro: ruído curto e abafado, o chiado de uma vassourinha */
+function escova(t0, g, pan, dur, corte, semente) {
+  const ini = Math.floor(t0 * SR);
+  if (ini >= N || g <= 0) return;
+  const fim = Math.min(N, ini + Math.floor(dur * SR));
+  const r = rng(semente);
+  let z = 0;
+  for (let i = ini; i < fim; i++) {
+    const t = (i - ini) / SR;
+    z += corte * (r() - z);                     /* passa-baixa: tira o bico do ruído */
+    const a = z * Math.exp(-t / (dur * .30)) * g;
+    L[i] += a * (1 - pan * .55);
+    R[i] += a * (1 + pan * .55);
   }
 }
 
 /* ---------------- arranjo ---------------- */
 
-/* almofada e baixo: cada bloco entra antes do anterior sair */
 for (let b = 0; b < nBlocos; b++) {
-  const ac = ACORDES[ORDEM[b % ORDEM.length]];
-  const t0 = b * BLOCO - (b === 0 ? 0 : 1.6);
-  const dur = BLOCO + (b === 0 ? 2.0 : 3.6);
-  /* o filme começa quase só com ar; a almofada cresce até a mesa de montagem */
-  const corpo = lerp(.42, 1, ramp(b * BLOCO, 4, 26));
-  ac.notas.forEach((n, j) => {
-    const pan = (j - 1.5) / 3;
-    almofada(t0, dur, mtof(n), .072 * corpo * (j === 3 ? .7 : 1), pan);
-  });
-  baixo(t0, dur, mtof(ac.baixo), .085 * corpo);
-}
+  const ac = ACORDES[b === nBlocos - 1 ? 0 : ORDEM[b % ORDEM.length]];
+  const t0 = b * BLOCO;
 
-/* melodia: só entra quando o filme começa a explicar (cena 02 em diante) */
-const RITMOS = [
-  [0, 1.5, 3.0, 4.25, 6.0],
-  [.5, 2.0, 3.5, 5.0, 6.5],
-  [0, 1.0, 2.75, 4.5, 5.75, 7.25]
-];
-const CONTORNOS = [
-  [4, 3, 2, 3, 1],
-  [2, 4, 3, 1, 2],
-  [0, 2, 3, 4, 3, 1]
-];
-const MEL_INI = 13.0;   /* entra junto com "o link da bio" */
-for (let b = 0; b < nBlocos; b++) {
-  const ac = ACORDES[ORDEM[b % ORDEM.length]];
-  const rit = RITMOS[b % RITMOS.length], cont = CONTORNOS[b % CONTORNOS.length];
-  for (let k = 0; k < rit.length; k++) {
-    const t = b * BLOCO + rit[k];
-    if (t < MEL_INI - 1 || t > DUR - .6) continue;
-    const grau = cont[k % cont.length];
-    let nota = ac.mel[grau];
-    /* um brilho a mais na parte dos modelos e dos degraus */
-    if ((t > 77 && t < 93) || t > 104) if (k % 3 === 1) nota += 12;
-    const abre = ramp(t, MEL_INI, MEL_INI + 3.5);
-    const fecha = 1 - ramp(t, DUR - 7, DUR - 1.5);
-    const g = .30 * abre * fecha * (k % 2 === 0 ? 1 : .78);
-    const pan = ((k % 3) - 1) * .5;
-    if (g <= 0) continue;
-    sino(t, mtof(nota), g, pan);
-    /* eco: três repetições cada vez mais fracas, alternando os lados */
-    for (let e = 1; e <= 3; e++) {
-      const te = t + e * .42;
-      if (te > DUR - .3) break;
-      sino(te, mtof(nota), g * Math.pow(.44, e), -pan * (e % 2 ? 1 : -1));
+  /* o filme abre quase no silêncio e a trilha vai entrando */
+  const corpo = ramp(t0, 0, 12) * (1 - ramp(t0, DUR - 9, DUR - 2));
+
+  for (let c = 0; c < 2; c++) {
+    const tc = t0 + c * COMPASSO;
+    if (tc > DUR - .4) break;
+    const peso = c === 0 ? 1 : .74;             /* o segundo compasso responde mais baixo */
+
+    /* o acorde é rolado, não batido: cada voz entra uns milésimos depois */
+    ac.notas.forEach((n, j) => {
+      const pan = (j - 1.5) / 2.2;
+      rhodes(tc + j * .034, mtof(n), .098 * corpo * peso * (j === 3 ? .82 : 1), pan);
+    });
+    baixo(tc, mtof(ac.baixo), .058 * corpo * peso);
+  }
+
+  /* uma nota solta por bloco, só para o ouvido ter onde pousar */
+  if (b % 2 === 1) {
+    const tm = t0 + COMPASSO + 2 * BAT;
+    const abre = ramp(t0, 16, 34) * (1 - ramp(t0, DUR - 16, DUR - 6));
+    rhodes(tm, mtof(ac.mel[b % ac.mel.length]), .050 * corpo * abre, .30, 3.2);
+  }
+
+  /* batida: entra tarde, sai cedo e fica sempre embaixo de tudo */
+  const bat = ramp(t0, 18, 30) * (1 - ramp(t0, DUR - 20, DUR - 10)) * corpo;
+  if (bat > .001) {
+    for (let c = 0; c < 2; c++) {
+      const tc = t0 + c * COMPASSO;
+      bumbo(tc, .034 * bat);
+      bumbo(tc + 2.5 * BAT, .024 * bat);
+      escova(tc + 2 * BAT, .020 * bat, -.2, .30, .22, 4242 + b * 7 + c);   /* aro no 3 */
+      for (let h = 0; h < 4; h++)                                          /* contratempos */
+        escova(tc + (h + .5) * BAT, .0085 * bat * (h % 2 ? .7 : 1), .35, .13, .40, 911 + b * 13 + c * 5 + h);
     }
   }
 }
 
-ar(.030);
+/* ---------------- fita: a ondulação que faz soar gravado ---------------- */
+function fita(buf, fase) {
+  const out = new Float64Array(N);
+  const base = 6.0;                              /* atraso de repouso, em milésimos */
+  for (let i = 0; i < N; i++) {
+    const t = i / SR;
+    const wow   = 2.30 * Math.sin(2 * Math.PI * .63 * t + fase);
+    const lento = 1.55 * Math.sin(2 * Math.PI * .17 * t + fase * 1.7 + .7);
+    const flu   = 0.26 * Math.sin(2 * Math.PI * 6.10 * t + fase * 2.3 + 1.3);
+    const j = i - (base + wow + lento + flu) * SR / 1000;
+    if (j < 1) { out[i] = buf[i]; continue; }
+    const j0 = Math.floor(j), fr = j - j0;
+    out[i] = buf[j0] * (1 - fr) + buf[j0 + 1] * fr;
+  }
+  return out;
+}
 
-/* ---------------- sala (reverberação Schroeder simples) ---------------- */
+/* ---------------- sala ---------------- */
 function reverb(buf, offset) {
   const combs = [1557, 1617, 1491, 1422, 1277, 1116].map(d => d + offset);
-  const fb = [.74, .735, .73, .725, .72, .715];
+  const fb = [.70, .695, .69, .685, .68, .675];
   const out = new Float64Array(N);
   for (let c = 0; c < combs.length; c++) {
     const d = combs[c], lin = new Float64Array(d);
@@ -170,13 +190,12 @@ function reverb(buf, offset) {
     for (let i = 0; i < N; i++) {
       const y = lin[idx];
       out[i] += y;
-      filt = y * .40 + filt * .60;           /* abafa a cauda, para não sibilar */
+      filt = y * .34 + filt * .66;              /* abafa a cauda, para não sibilar */
       lin[idx] = buf[i] + filt * fb[c];
       if (++idx >= d) idx = 0;
     }
   }
   for (let i = 0; i < N; i++) out[i] /= combs.length;
-  /* dois passa-tudo para espalhar */
   [225 + offset, 556 + offset].forEach(d => {
     const lin = new Float64Array(d); let idx = 0;
     for (let i = 0; i < N; i++) {
@@ -189,26 +208,72 @@ function reverb(buf, offset) {
   return out;
 }
 
-const wetL = reverb(L, 0), wetR = reverb(R, 23);
-const WET = .20;
+/* ---------------- filtros de tom ---------------- */
+const passaBaixa = (buf, fc) => {
+  const c = 1 - Math.exp(-2 * Math.PI * fc / SR);
+  let z = 0;
+  for (let i = 0; i < N; i++) { z += c * (buf[i] - z); buf[i] = z; }
+};
+const passaAlta = (buf, fc) => {
+  const c = 1 - Math.exp(-2 * Math.PI * fc / SR);
+  let z = 0;
+  for (let i = 0; i < N; i++) { z += c * (buf[i] - z); buf[i] -= z; }
+};
+
+/* a fita primeiro: a ondulação tem que pegar as notas, não a sala */
+let mL = fita(L, 0), mR = fita(R, 1.9);
+/* duas passagens de passa-baixa: o agudo fica abafado, como em fita velha */
+passaBaixa(mL, 4800); passaBaixa(mL, 6800);
+passaBaixa(mR, 4800); passaBaixa(mR, 6800);
+passaAlta(mL, 42); passaAlta(mR, 42);
+
+const wetL = reverb(mL, 0), wetR = reverb(mR, 23);
+const WET = .17;
 for (let i = 0; i < N; i++) {
-  L[i] = L[i] * (1 - WET * .45) + wetL[i] * WET;
-  R[i] = R[i] * (1 - WET * .45) + wetR[i] * WET;
+  mL[i] = mL[i] * (1 - WET * .40) + wetL[i] * WET;
+  mR[i] = mR[i] * (1 - WET * .40) + wetR[i] * WET;
 }
+
+/* ---------------- vinil: chiado contínuo e estalos esparsos ---------------- */
+(() => {
+  const rh = rng(24680), rc = rng(13579);
+  let z1 = 0, z2 = 0, z3 = 0, z4 = 0;
+  for (let i = 0; i < N; i++) {
+    const t = i / SR;
+    const env = Math.min(ramp(t, 0, 3.5), 1 - ramp(t, DUR - 4.5, DUR));
+    z1 += .085 * (rh() - z1); z2 += .085 * (z1 - z2);
+    z3 += .085 * (rh() - z3); z4 += .085 * (z3 - z4);
+    mL[i] += z2 * .105 * env;
+    mR[i] += z4 * .105 * env;
+    /* uns três estalos por segundo, cada um com seu lado e seu tamanho */
+    if (rc() > .99985) {
+      const amp = .020 * env * (.35 + .65 * Math.abs(rc()));
+      const pan = rc() * .6;
+      const len = 60 + Math.floor(Math.abs(rc()) * 150);
+      for (let k = 0; k < len && i + k < N; k++) {
+        const s = amp * Math.exp(-k / (len * .26)) * (k === 0 ? 1 : rc() * .55);
+        mL[i + k] += s * (1 - pan);
+        mR[i + k] += s * (1 + pan);
+      }
+    }
+  }
+})();
 
 /* ---------------- mestre: tira o contínuo, entra, sai e nunca estoura ---------------- */
 let pico = 0, xL = 0, yL = 0, xR = 0, yR = 0;
 for (let i = 0; i < N; i++) {
   const t = i / SR;
   /* bloqueador de corrente contínua: a realimentação da sala empurra o zero */
-  yL = L[i] - xL + .9950 * yL; xL = L[i];
-  yR = R[i] - xR + .9950 * yR; xR = R[i];
-  const env = Math.min(ramp(t, 0, 2.6), 1 - ramp(t, DUR - 4.2, DUR - .15));
-  L[i] = Math.tanh(yL * 1.25 * env) * .92;
-  R[i] = Math.tanh(yR * 1.25 * env) * .92;
-  pico = Math.max(pico, Math.abs(L[i]), Math.abs(R[i]));
+  yL = mL[i] - xL + .9950 * yL; xL = mL[i];
+  yR = mR[i] - xR + .9950 * yR; xR = mR[i];
+  const env = Math.min(ramp(t, 0, 3.0), 1 - ramp(t, DUR - 4.0, DUR - .15));
+  mL[i] = Math.tanh(yL * 1.15 * env) * .92;
+  mR[i] = Math.tanh(yR * 1.15 * env) * .92;
+  pico = Math.max(pico, Math.abs(mL[i]), Math.abs(mR[i]));
 }
-const norm = pico > 0 ? .50 / pico : 1;
+/* trilha de fundo: pico bem abaixo do teto, para não disputar com a imagem */
+const ALVO = .46;
+const norm = pico > 0 ? ALVO / pico : 1;
 
 /* ---------------- arquivo WAV ---------------- */
 const bytes = N * 4;
@@ -218,11 +283,17 @@ buf.write('fmt ', 12); buf.writeUInt32LE(16, 16); buf.writeUInt16LE(1, 20);
 buf.writeUInt16LE(2, 22); buf.writeUInt32LE(SR, 24); buf.writeUInt32LE(SR * 4, 28);
 buf.writeUInt16LE(4, 32); buf.writeUInt16LE(16, 34);
 buf.write('data', 36); buf.writeUInt32LE(bytes, 40);
+let somaQ = 0;
 for (let i = 0; i < N; i++) {
-  buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(L[i] * norm * 32767))), 44 + i * 4);
-  buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(R[i] * norm * 32767))), 46 + i * 4);
+  const l = mL[i] * norm, r = mR[i] * norm;
+  somaQ += l * l + r * r;
+  buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(l * 32767))), 44 + i * 4);
+  buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(r * 32767))), 46 + i * 4);
 }
 const saida = path.join(dir, '..', 'out', 'trilha.wav');
 fs.writeFileSync(saida, buf);
-console.log(`trilha: ${DUR}s · ${nBlocos} acordes · pico ${(20 * Math.log10(pico)).toFixed(1)} dBFS · ${(buf.length / 1048576).toFixed(1)} MB`);
+const rms = Math.sqrt(somaQ / (N * 2));
+console.log(`trilha lo-fi: ${DUR}s · ${BPM} bpm · ${nBlocos} acordes · ` +
+  `pico ${(20 * Math.log10(ALVO)).toFixed(1)} dBFS · médio ${(20 * Math.log10(rms)).toFixed(1)} dBFS · ` +
+  `${(buf.length / 1048576).toFixed(1)} MB`);
 console.log(saida);

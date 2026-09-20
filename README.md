@@ -12,9 +12,10 @@ Tudo é feito em JavaScript, sem banco de imagens:
   são caminhos vetoriais escritos à mão em `src/js/draw.js`);
 - **movimento** — uma linha do tempo determinística: `seek(t)` desenha o quadro
   exato do instante `t`, sem depender de relógio ou de `requestAnimationFrame`;
-- **som** — o filme sai mudo, com uma faixa silenciosa (sem faixa nenhuma, o envio
-  do Instagram engasga). A trilha sintetizada por soma de senoides continua no
-  repositório, em `scripts/music.mjs`, e entra depois com `scripts/mux.mjs`;
+- **som** — trilha lo-fi sintetizada em JavaScript puro (`scripts/music.mjs`):
+  piano elétrico abafado, baixo redondo, uma batida quase só sentida, ondulação
+  de fita e chiado de vinil. É ambientação: fica embaixo da imagem e não disputa
+  com ela;
 - **montagem** — Playwright fotografa quadro a quadro e joga tudo num cano para o
   ffmpeg, que fecha o MP4 na mesma passada.
 
@@ -22,15 +23,16 @@ Tudo é feito em JavaScript, sem banco de imagens:
 
 ```bash
 npm install
-npm run video        # renderiza e monta out/atelie-digital-como-funciona.mp4, ~10 min
+npm run video                                   # quadros + montagem, sai mudo, ~10 min
+node scripts/music.mjs 145                      # out/trilha.wav, no total do filme
+node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha.wav
 ```
 
-Para pôr uma trilha no filme já renderizado, sem refazer os quadros:
+O render sai mudo de propósito e a trilha entra por cima: assim dá para mexer na
+música sem refazer os 4.350 quadros. Para tirar a música de volta:
 
 ```bash
-npm run music                 # out/trilha.wav — peça o total em segundos: node scripts/music.mjs 145
-node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha.wav
-node scripts/mux.mjs atelie-digital-como-funciona.mp4 mudo     # tira de volta
+node scripts/mux.mjs atelie-digital-como-funciona.mp4 mudo
 ```
 
 Conferir um trecho sem esperar o filme todo:
@@ -105,6 +107,11 @@ soma as durações sozinha, e a trilha aceita o novo total em
 - **O adicional é vendido junto com as cores.** A cena 14 mantém os três degraus
   e põe embaixo, numa faixa à parte, a assinatura mensal: cartela de cores e
   tendências mais radar de compras.
+- **A trilha é ambientação, não tema.** Roda de jazz em dó maior a 72 bpm, com
+  pico em −6,7 dBFS e nível médio em −25 dBFS. Medida com ponderação A, a faixa
+  abaixo de 120 Hz responde por 0,3 % do que se ouve: nada de peso no grave, que
+  foi o que fez a trilha anterior soar pesada. A batida entra só aos 18 s e sai
+  20 s antes do fim, para abertura e fechamento ficarem só com os acordes.
 
 ## Créditos técnicos
 
