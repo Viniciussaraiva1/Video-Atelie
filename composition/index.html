@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ateliê Digital — como funciona</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="frame">
+  <!-- Persistent chrome -->
+  <div id="chrome">
+    <div id="label"><span class="num-wrap"></span><span class="rule"></span><span class="title-wrap"></span></div>
+    <div id="brand">ATELIÊ DIGITAL</div>
+    <div id="progress"><div id="progress-fill"></div></div>
+  </div>
+  <div id="captions"></div>
+
+  <!-- Stages are filled by app.js -->
+  <section class="stage" id="st-intro"></section>
+  <section class="stage" id="st-01"></section>
+  <section class="stage" id="st-02"></section>
+  <section class="stage" id="st-mesa"></section>
+  <section class="stage" id="st-09"></section>
+  <section class="stage" id="st-10"></section>
+  <section class="stage" id="st-11"></section>
+  <section class="stage" id="st-12"></section>
+  <section class="stage" id="st-13"></section>
+  <section class="stage" id="st-14"></section>
+  <section class="stage" id="st-outro"></section>
+
+  <div id="cursor-layer">
+    <div id="ripple"></div>
+    <svg id="cursor" viewBox="0 0 28 34" width="28" height="34">
+      <path d="M3 2 L3 26 L9.2 20.4 L13.4 30.2 L17.6 28.4 L13.5 18.8 L21.8 18.8 Z" fill="#141312" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div id="fade"></div>
+</div>
+<script src="vendor/gsap.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
