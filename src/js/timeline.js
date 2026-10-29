@@ -22,7 +22,8 @@ const TL = (() => {
   };
   const veil = document.getElementById('veil');
 
-  const cenas = SCENES.list;
+  /* o corte vertical traz o próprio roteiro; o filme principal usa SCENES.list */
+  const cenas = window.ROTEIRO || SCENES.list;
   const ini = [];
   let acc = 0;
   cenas.forEach(c => { ini.push(acc); acc += c.dur; });
@@ -82,7 +83,7 @@ const TL = (() => {
                  * (1 - FX.smooth(FX.span(t, ini[cenas.length - 1] - .9, ini[cenas.length - 1] + .2)));
     chrome.mark.style.opacity = dentro * .999;
     chrome.barra.style.opacity = dentro;
-    chrome.prog.style.width = (t / TOTAL * 1920) + 'px';
+    chrome.prog.style.width = (t / TOTAL * 100) + '%';
 
     veil.style.opacity = FX.smooth(FX.span(t, TOTAL - FIM, TOTAL - .12));
   }
@@ -92,6 +93,8 @@ const TL = (() => {
 
 /* ---- ganchos do renderizador ---- */
 window.__DUR = TL.TOTAL;
+window.__W = document.getElementById('stage').clientWidth;
+window.__H = document.getElementById('stage').clientHeight;
 window.__seek = t => TL.seek(t);
 window.__ready = false;
 document.fonts.ready.then(() => { TL.seek(0); requestAnimationFrame(() => { window.__ready = true; }); });

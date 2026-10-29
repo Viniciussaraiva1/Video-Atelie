@@ -8,11 +8,13 @@ const SCENES = (() => {
   const { put, el } = UI;
   const F = FX;
 
-  /* posição de um elemento em coordenadas do palco */
+  /* posição de um elemento em coordenadas do palco (horizontal ou vertical) */
+  const palco = document.getElementById('stage');
   const pt = n => {
     const r = n.getBoundingClientRect();
+    const cx = palco.clientWidth / 2, cy = palco.clientHeight / 2;
     const sc = n.closest('.scene'), k = (sc && sc._zoom) || 1;   /* desfaz a aproximação da cena */
-    return { x: 960 + (r.left + r.width / 2 - 960) / k, y: 540 + (r.top + r.height / 2 - 540) / k };
+    return { x: cx + (r.left + r.width / 2 - cx) / k, y: cy + (r.top + r.height / 2 - cy) / k };
   };
 
   /* entrada em sequência: cada nó sobe e aparece */
@@ -125,7 +127,7 @@ const SCENES = (() => {
 
   /* cursor: caminho pelos alvos + anel de clique */
   function drive(m, t, evs, st, entrada) {
-    const pts = entrada ? [{ t: -1.2, x: entrada.x, y: entrada.y }] : [];
+    const pts = entrada ? [{ t: entrada.t == null ? -1.2 : entrada.t, x: entrada.x, y: entrada.y }] : [];
     evs.forEach(e => {
       const a = alvo(m.P, e.st || st, e);
       if (!a) return;
@@ -151,8 +153,17 @@ const SCENES = (() => {
     return F.clamp(alvo, 0, Math.max(0, total - m.B.vpH));
   }
 
-  /* fábrica das cenas que usam a mesa de montagem */
+  /* fábrica das cenas que usam a mesa de montagem.
+     foco é o controle em destaque; focos, quando a cena passa por mais de
+     um, é a lista [{t, f}] das trocas, e o destaque desliza entre eles.
+     cursorDe é o instante em que o cursor aparece. */
   function mesaScene(cfg) {
+    const focos = cfg.focos || (cfg.foco ? [{ t: -9, f: cfg.foco }] : []);
+    const opFoco = (k, t) => focos.reduce((op, x, i) => {
+      const alvo = x.f == null ? 1 : (k === x.f ? 1 : .32);
+      return i === 0 ? alvo : F.lerp(op, alvo, F.smooth(F.span(t, x.t, x.t + .45)));
+    }, 1);
+    const cursorDe = cfg.cursorDe == null ? .1 : cfg.cursorDe;
     return {
       id: cfg.id, num: cfg.num, label: cfg.label, caption: cfg.caption, dur: cfg.dur,
       build(s) {
@@ -167,9 +178,10 @@ const SCENES = (() => {
         /* altura da página menos as seções abertas: sempre a mesma, em qualquer ordem de render */
         const extra = UI.applySite(m.S, page);
         m.baseH = m.S.root.offsetHeight - extra;
-        paintPanel(m.P, st, cfg.foco);
+        paintPanel(m.P, st);
+        ['fundo', 'cor', 'letra', 'espaco', 'home'].forEach(k => { m.P.ctrls[k].el.style.opacity = opFoco(k, t); });
         drive(m, t, cfg.evs || [], st, cfg.entrada);
-        m.cur.show(cfg.semCursor ? 0 : F.clamp(F.span(t, .1, .5)));
+        m.cur.show(cfg.semCursor ? 0 : F.clamp(F.span(t, cursorDe, cursorDe + .4)));
         /* rolagem */
         let sc = cfg.scroll ? cfg.scroll(m, st, t) : 0;
         m.S.root.parentElement.style.transform = `translateY(${-sc}px)`;
@@ -185,30 +197,30 @@ const SCENES = (() => {
 
   /* ---------- abertura ---------- */
   list.push({
-    id: 'abertura', dur: 5.5, label: null, caption: null,
+    id: 'abertura', dur: 4.5, label: null, caption: null,
     build(s) {
       const c = put(s, 'div', 'center'); c.style.top = '352px';
-      s._k = put(c, 'div', 'kicker', 'Vitrines para quem vende pelo Instagram');
+      s._k = put(c, 'div', 'kicker', 'Vitrines para boutiques que vendem pelo Instagram');
       s._t = put(c, 'div', 'display');
       Object.assign(s._t.style, { fontSize: '154px', marginTop: '46px', fontStyle: 'italic', letterSpacing: '-.03em' });
       s._t.innerHTML = 'Ateliê Digital';
       s._r = put(c, 'div', 'hair'); Object.assign(s._r.style, { width: '0px', marginTop: '54px' });
       s._s = put(c, 'div');
       Object.assign(s._s.style, { font: "italic 400 32px/1.4 'Playfair',serif", color: 'rgba(23,22,20,.6)', marginTop: '40px' });
-      s._s.textContent = 'como funciona, do começo ao fim';
+      s._s.textContent = 'a sua loja respondendo por você';
     },
     update(s, t) {
-      fade(s._k, F.outQuint(F.span(t, .15, 1.3)));
-      const k = F.outQuint(F.span(t, .5, 2.3));
+      fade(s._k, F.outQuint(F.span(t, .15, 1.1)));
+      const k = F.outQuint(F.span(t, .35, 1.9));
       s._t.style.opacity = k; s._t.style.transform = `translateY(${(1 - k) * 28}px)`;
-      s._r.style.width = (F.ease(F.span(t, 1.7, 3.1)) * 430) + 'px';
-      fade(s._s, F.outQuint(F.span(t, 2.5, 3.9)));
+      s._r.style.width = (F.ease(F.span(t, 1.3, 2.5)) * 430) + 'px';
+      fade(s._s, F.outQuint(F.span(t, 1.9, 3.1)));
     }
   });
 
   /* ---------- 01 · o problema ---------- */
   list.push({
-    id: 'problema', num: '01', label: 'O problema', dur: 8.0,
+    id: 'problema', num: '01', label: 'O problema', dur: 7.0,
     caption: 'A cliente chega pelo Instagram e pergunta o que já podia estar escrito na página.',
     build(s) {
       const b = put(s, 'div', 'display');
@@ -246,14 +258,14 @@ const SCENES = (() => {
       const vis = Math.max(0, Math.min(s._rows.length, Math.floor((t - t0) / step) + 1));
       const desce = Math.max(0, vis - 7) * 58;
       s._lista.style.transform = `translateY(${-desce}px)`;
-      const n = Math.round(F.ease(F.span(t, 1.0, 7.0)) * 47);
+      const n = Math.round(F.ease(F.span(t, 1.0, 6.4)) * 47);
       s._ct.textContent = n + ' hoje';
     }
   });
 
   /* ---------- 02 · o link da bio ---------- */
   list.push({
-    id: 'bio', num: '02', label: 'O link da bio', dur: 10.0,
+    id: 'bio', num: '02', label: 'O link da bio', dur: 8.5,
     caption: 'O link da bio manda a cliente para uma lista de links. A vitrine resolve na mesma tela.',
     build(s) {
       const cor = '#c08a78';
@@ -285,13 +297,13 @@ const SCENES = (() => {
       Object.assign(s._nb.style, { left: '1540px', top: '640px', width: '300px' });
     },
     update(s, t) {
-      const ka = F.outQuint(F.span(t, .2, 1.5));
+      const ka = F.outQuint(F.span(t, .2, 1.4));
       s._A.root.style.opacity = ka; s._A.root.style.transform = `translateY(${(1 - ka) * 26}px)`;
-      const kb = F.outQuint(F.span(t, 1.6, 3.0));
+      const kb = F.outQuint(F.span(t, 1.3, 2.6));
       s._B.root.style.opacity = kb; s._B.root.style.transform = `translateY(${(1 - kb) * 26}px)`;
-      fade(s._ta, F.span(t, .8, 1.6)); fade(s._tb, F.span(t, 2.2, 3.0));
-      fade(s._v, F.span(t, 3.1, 3.9));
-      rise([s._na], t, 4.2, 0, 1.0); rise([s._nb], t, 5.4, 0, 1.0);
+      fade(s._ta, F.span(t, .7, 1.4)); fade(s._tb, F.span(t, 1.9, 2.6));
+      fade(s._v, F.span(t, 2.7, 3.4));
+      rise([s._na], t, 3.5, 0, 1.0); rise([s._nb], t, 4.5, 0, 1.0);
     }
   });
 

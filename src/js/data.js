@@ -32,7 +32,7 @@ const DATA = {
     { grupo: 'Profundos', cores: [
       { nome: 'Red Mahogany', hex: '#7b3230' }, { nome: 'Bordô', hex: '#5e1f2b' },
       { nome: 'Marinho', hex: '#1e2a44' }, { nome: 'Púrpura', hex: '#5b3a78' } ] },
-    { grupo: 'Vivos', cores: [
+    { grupo: 'Saturados', cores: [
       { nome: 'Acacia', hex: '#e3c14e' }, { nome: 'Chartreuse', hex: '#c3d14a' },
       { nome: 'Foxglove', hex: '#c39bc4' }, { nome: 'Neptune Green', hex: '#3e8a80' } ] },
     { grupo: 'Neutros', cores: [
@@ -65,16 +65,20 @@ const DATA = {
     { id: 'endereco', nome: 'Endereço' }
   ],
 
-  /* 8 modelos prontos por tipo de loja */
+  /* os 12 modelos prontos da página do Ateliê, com o mesmo nome, fundo e cor */
   modelos: [
-    { nome: 'Moda feminina',   cor: '#c08a78', fundo: '#faf7f1', letra: 0 },
-    { nome: 'Moda praia',      cor: '#3e8a80', fundo: '#f2f2f0', letra: 1 },
-    { nome: 'Festa e noivas',  cor: '#5b3a78', fundo: '#faf7f1', letra: 2 },
-    { nome: 'Infantil',        cor: '#c39bc4', fundo: '#efe5d7', letra: 2 },
-    { nome: 'Joias',           cor: '#e3c14e', fundo: '#1b1a18', letra: 0 },
-    { nome: 'Brechó',          cor: '#7b3230', fundo: '#efe5d7', letra: 3 },
-    { nome: 'Calçados e bolsas', cor: '#1e2a44', fundo: '#f2f2f0', letra: 1 },
-    { nome: 'Plus size',       cor: '#5e1f2b', fundo: '#faf7f1', letra: 3 }
+    { nome: 'Boutique de vestido',   cor: '#7a6a5b', fundo: '#fdfbf7', letra: 0 },
+    { nome: 'Marca autoral',         cor: '#101012', fundo: '#ffffff', letra: 1 },
+    { nome: 'Alfaiataria feminina',  cor: '#1e2a44', fundo: '#f2f0ee', letra: 1 },
+    { nome: 'Slow fashion e linho',  cor: '#bfccb6', fundo: '#f4eee2', letra: 2 },
+    { nome: 'Tricot e malharia',     cor: '#c19a6b', fundo: '#efe7da', letra: 0 },
+    { nome: 'Festa e noiva',         cor: '#6b1f26', fundo: '#17151a', letra: 2 },
+    { nome: 'Beachwear e resort',    cor: '#3e8a92', fundo: '#e8ede9', letra: 1 },
+    { nome: 'Lingerie e loungewear', cor: '#e0cdc0', fundo: '#f2f0ee', letra: 2 },
+    { nome: 'Curve autoral',         cor: '#a8305f', fundo: '#fdfbf7', letra: 0 },
+    { nome: 'Denim autoral',         cor: '#2b3a67', fundo: '#ffffff', letra: 3 },
+    { nome: 'Multimarcas curada',    cor: '#a99c8c', fundo: '#f4eee2', letra: 0 },
+    { nome: 'Vintage garimpado',     cor: '#8a7439', fundo: '#141b2b', letra: 0 }
   ],
 
   /* peças da vitrine de demonstração */
@@ -89,17 +93,21 @@ const DATA = {
     { nome: 'Capa Curta',      preco: 'R$ 468',  croqui: 'capa'    }
   ],
 
-  /* briefing gerado automaticamente ao fim da montagem */
+  /* pedido de prévia que a mesa escreve sozinha. Vai pelo WhatsApp com
+     cinco fotos de peças, e a prévia volta montada antes de qualquer pagamento. */
   briefing: [
-    'Marca: Casa Amaré — moda feminina',
-    'Fundo da página: Papel',
-    'Cor da marca: Muted Clay #c08a78',
-    'Jeito da letra: Editorial',
-    'Espaço entre as peças: Equilíbrio',
-    'Na home: vitrine, sobre a marca,',
-    'depoimentos, WhatsApp e endereço',
-    'Vitrine inicial: 12 peças'
+    'Loja: Casa Amaré — moda feminina, BH',
+    'Modelo: Boutique de vestido',
+    'Fundo: Papel · Cor: Muted Clay',
+    'Letra: Editorial · Vitrine: Equilíbrio',
+    'Na home: sobre, depoimentos e WhatsApp'
   ],
+  previa: {
+    prazo: 'em até 2 dias úteis',
+    fotos: ['casaco', 'vestido', 'tailleur', 'capa', 'vestido'],
+    convite: 'Me manda o que você montou e cinco fotos de peças. A prévia é por minha conta.',
+    resposta: 'Recebi! A sua vitrine fica pronta em até 2 dias úteis. Se não gostar, não paga nada.'
+  },
 
   /* acompanhamento de compras: o que a loja compra, ofertas e fornecedores novos.
      Os preços são por peça ou por metro, lidos semana a semana. */
@@ -116,18 +124,18 @@ const DATA = {
       { peca: 'Aviamentos e botões',     seg: 'Aviamentos',  forn: 'Casa Marfim',
         serie: [34, 33, 31, 30, 28, 27, 27, 27], vr: '−21%', dir: 'desce' }
     ],
+    /* o que o radar achou no mês. A economia é diferença de preço vezes a
+       quantidade que a loja já ia comprar, e o fornecedor novo entra aqui
+       quando sai mais barato que o de sempre. */
     ofertas: [
       { peca: 'Vestido midi em viscose', forn: 'Atacado Vila Nova',
-        de: 'R$ 68', por: 'R$ 60', nota: 'lote de 20 peças · até sexta', ganho: 160 },
+        de: 'R$ 68', por: 'R$ 60', nota: 'lote de 40 peças · até sexta', ganho: 320 },
+      { peca: 'Linho tinto em peça', forn: 'Tecelagem Brandão · fornecedor novo', novo: true,
+        de: 'R$ 47', por: 'R$ 42', nota: 'preço do metro · 80 m · entrega em 6 dias', ganho: 400 },
       { peca: 'Aviamentos e botões', forn: 'Casa Marfim',
-        de: 'R$ 34', por: 'R$ 27', nota: 'pedido fechado do mês', ganho: 210 }
+        de: 'R$ 34', por: 'R$ 27', nota: '45 kits · pedido fechado do mês', ganho: 315 }
     ],
-    novos: [
-      { nome: 'Tecelagem Brandão', seg: 'Linho e algodão tinto',
-        cidade: 'Blumenau · SC', cond: 'mínimo 15 m · entrega em 6 dias' },
-      { nome: 'Fio Nobre', seg: 'Forros e entretelas',
-        cidade: 'Americana · SP', cond: 'mínimo 10 m · entrega em 4 dias' }
-    ]
+    mes: { economia: 1035, radar: 340 }
   },
 
   /* números do estudo de tendências que sustentam as escolhas de cor */
@@ -138,18 +146,29 @@ const DATA = {
     { n: '15',  t: 'tons na carta 26/27' }
   ],
 
-  /* três degraus de oferta */
-  degraus: [
-    { n: '01', t: 'Página de venda',   d: 'A vitrine no ar, com as peças, os preços e o botão do WhatsApp.' },
-    { n: '02', t: 'Identidade e site', d: 'A cara da marca inteira: cores, letra, fotos e as páginas de dentro.' },
-    { n: '03', t: 'Acompanhamento',    d: 'Troca de coleção, leitura dos números e ajuste do que não converte.' }
+  /* a oferta em dois passos, com os mesmos preços da página do Ateliê:
+     primeiro a vitrine, com pagamento único; depois a temporada, mês a mês */
+  precos: [
+    { k: 'Passo 1 · a vitrine', s: 'pagamento único', itens: [
+      { t: 'Página de venda', p: 'R$ 890',
+        d: 'Vitrine com carrinho, Pix, cartão e frete pelo CEP. No ar em 7 dias úteis.' },
+      { t: 'Identidade e site', p: 'R$ 2.490', selo: 'o mais pedido',
+        d: 'Tudo da página, mais cartela exclusiva, manual da marca e ficha de cada peça.' } ] },
+    { k: 'Passo 2 · a temporada', s: 'mensal, sem fidelidade', itens: [
+      { t: 'Plano Temporada', p: 'R$ 490', u: '/mês',
+        d: 'Os números do mês, o ajuste do que não vende e a cartela refeita a cada coleção.' },
+      { t: 'Radar de compra', p: '+ R$ 340', u: '/mês',
+        d: 'O preço do que você compra, as ofertas da semana e fornecedores novos.' } ] }
   ],
 
-  /* assinatura mensal que anda junto: o estudo e o radar de compras */
-  adicional: [
-    { t: 'Cartela de cores e tendências', c: '#c08a78',
-      d: 'A carta da temporada refeita a cada estação, abastecendo a lista da mesa.' },
-    { t: 'Radar de compras', c: '#3e8a80',
-      d: 'O preço do que você compra, as ofertas da semana e fornecedores novos.' }
+  /* o que vem junto e não muda o preço — as mesmas regras da página */
+  inclusos: ['Sem mensalidade na página', 'Pix e cartão caem direto na sua conta',
+             'Catálogo sem limite de peças', 'A cartela e o manual ficam com você'],
+
+  /* o risco sai das costas da lojista */
+  semRisco: [
+    { n: '01', t: 'Prévia grátis', d: 'Cinco peças suas montadas na vitrine, em até 2 dias úteis. Não gostou, não paga.' },
+    { n: '02', t: 'Metade para começar', d: 'Aprovou a prévia: 50% para começar e o resto só com a página no ar.' },
+    { n: '03', t: 'No ar em 7 dias úteis', d: 'Com uma rodada de ajuste. Mensalidade só se você quiser a temporada.' }
   ]
 };

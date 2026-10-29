@@ -1,0 +1,59 @@
+/* ---------------------------------------------------------------
+   Corte vertical (1080×1920) para Reels, Stories e Status.
+   Por cima de base.css: muda o palco e a moldura, e acrescenta as
+   peças que só existem aqui. Tudo que importa fica entre 220 e
+   1500 px de altura, longe da faixa que o Instagram cobre com o
+   nome do perfil, a legenda e os botões.
+----------------------------------------------------------------*/
+:root{--W:1080px;--H:1920px;}
+html,body{width:1080px;height:1920px;}
+
+#label,#caption,#progress{display:none;}
+#mark{right:auto;left:0;width:100%;text-align:center;top:150px;text-indent:.42em;}
+
+/* título de cena: duas linhas, a segunda em itálico */
+.v-tit{position:absolute;left:60px;width:960px;text-align:center;}
+.v-k{position:absolute;left:0;width:100%;text-align:center;}
+
+/* rótulo e nota em volta do celular */
+.v-tag{position:absolute;left:0;width:100%;text-align:center;font:500 15px/1 'PlexMono',monospace;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--ink-42);opacity:0;}
+.v-nota{position:absolute;left:90px;width:900px;text-align:center;font:italic 400 36px/1.35 'Playfair',serif;
+  color:var(--ink-60);opacity:0;}
+
+/* telas que trocam dentro do mesmo celular */
+.phone .screen > .tela{position:absolute;inset:0;}
+
+/* escolhas da mesa, embaixo do celular */
+.v-chips{position:absolute;left:0;width:100%;display:flex;justify-content:center;gap:14px;}
+.v-chip{display:flex;flex-direction:column;align-items:center;gap:9px;min-width:220px;border:1.5px solid rgba(23,22,20,.16);
+  border-radius:18px;padding:18px 20px 17px;background:#fff;}
+.v-chip i{font:500 12px/1 'PlexMono',monospace;font-style:normal;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-42);}
+.v-chip b{font:400 25px/1 'Playfair',serif;font-weight:400;color:var(--ink);white-space:nowrap;}
+.v-chip.on{background:var(--ink);border-color:var(--ink);}
+.v-chip.on i{color:rgba(250,247,241,.6);}
+.v-chip.on b{color:var(--paper);}
+
+/* conversa da prévia */
+.wa .out .anx{flex-wrap:nowrap;}
+
+/* preços */
+.v-precos{position:absolute;left:90px;width:900px;}
+.v-precos .cab{display:flex;align-items:baseline;gap:16px;padding-bottom:18px;border-bottom:1.5px solid var(--ink);}
+.v-precos .cab + .row{margin-top:4px;}
+.v-precos .cab .kicker{color:var(--ink);font-size:16px;}
+.v-precos .cab .sub{font:italic 400 26px/1 'Playfair',serif;color:var(--ink-60);}
+.v-precos .row{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:28px 0 26px;
+  border-bottom:1px solid var(--rule);}
+.v-precos .row .t{font:400 42px/1.1 'Playfair',serif;color:var(--ink);letter-spacing:-.01em;}
+.v-precos .row .t small{display:block;font:500 12px/1 'PlexMono',monospace;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-42);margin-top:12px;}
+.v-precos .row .p{font:400 60px/1 'Playfair',serif;color:var(--ink);letter-spacing:-.02em;white-space:nowrap;}
+.v-precos .row .p small{font:400 22px/1 'Inter',sans-serif;color:var(--ink-42);margin-left:6px;letter-spacing:0;}
+.v-precos .g2{margin-top:70px;}
+
+.v-pill{position:absolute;left:0;width:100%;text-align:center;}
+.v-pill span{display:inline-flex;align-items:center;gap:14px;border:1.5px solid var(--ink);border-radius:999px;
+  padding:22px 36px;font:500 19px/1 'PlexMono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);}
+.v-pill span svg{width:24px;height:24px;}
+.v-pill.cheia span{background:var(--ink);color:var(--paper);}

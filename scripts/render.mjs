@@ -6,7 +6,10 @@
    O filme sai mudo, com uma faixa de áudio silenciosa: sem faixa
    nenhuma, alguns aplicativos (o envio do Instagram entre eles)
    engasgam. Para pôr uma trilha depois, use scripts/mux.mjs.
-   uso: node scripts/render.mjs [fps] [saída.mp4]
+   uso: node scripts/render.mjs [fps] [saída.mp4] [página.html]
+        node scripts/render.mjs 30 atelie-digital-vertical.mp4 vertical.html
+   O tamanho do quadro vem da própria página: 1920×1080 no filme
+   principal, 1080×1920 no corte vertical.
 ----------------------------------------------------------------*/
 import { chromium } from 'playwright';
 import { spawn } from 'child_process';
@@ -19,7 +22,8 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const raiz = path.join(dir, '..');
 const FPS = Number(process.argv[2] || 30);
 const SAIDA = path.join(raiz, 'out', process.argv[3] || 'atelie-digital-como-funciona.mp4');
-const EXEC = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const PAGINA = process.argv[4] || 'index.html';
+const EXEC = process.env.CHROME || '/opt/pw-browsers/chromium';
 
 const nav = await chromium.launch({
   executablePath: EXEC,
@@ -28,14 +32,16 @@ const nav = await chromium.launch({
 });
 const pag = await nav.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
 pag.on('pageerror', e => { console.error('ERRO NA PÁGINA:', e.message); process.exitCode = 1; });
-await pag.goto('file://' + path.join(raiz, 'src', 'index.html'));
+await pag.goto('file://' + path.join(raiz, 'src', PAGINA));
 await pag.waitForFunction('window.__ready===true', null, { timeout: 30000 });
+const [W, H] = await pag.evaluate('[window.__W, window.__H]');
+await pag.setViewportSize({ width: W, height: H });
 
 const DUR = await pag.evaluate('window.__DUR');
 /* DE e ATE (em segundos) rendem só um trecho, para conferir sem esperar o filme todo */
 const DE = Number(process.env.DE || 0), ATE = Number(process.env.ATE || DUR);
 const Q0 = Math.round(DE * FPS), TOTAL = Math.round((ATE - DE) * FPS);
-console.log(`filme: ${DUR}s · ${FPS} qps · trecho ${DE}–${ATE}s · ${TOTAL} quadros`);
+console.log(`filme: ${PAGINA} · ${W}×${H} · ${DUR}s · ${FPS} qps · trecho ${DE}–${ATE}s · ${TOTAL} quadros`);
 
 const ff = spawn(ffmpeg, [
   '-y', '-hide_banner', '-loglevel', 'error',

@@ -4,7 +4,10 @@
    batida quase só sentida, ondulação de fita e chiado de vinil.
    Feita para ficar embaixo da imagem: nada aqui pede atenção.
    Saída: out/trilha.wav (44,1 kHz, estéreo, 16 bits).
-   uso: node scripts/music.mjs [segundos]
+   uso: node scripts/music.mjs [segundos] [arquivo.wav]
+        node scripts/music.mjs 42 trilha-vertical.wav   — corte vertical
+   Em filme curto, a entrada da batida e da melodia encolhe junto: num
+   Reels de 40 s ninguém espera 18 s para o groove começar.
 ----------------------------------------------------------------*/
 import fs from 'fs';
 import path from 'path';
@@ -14,6 +17,9 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const SR = 44100;
 const DUR = Number(process.argv[2] || 145);
 const N = Math.ceil(DUR * SR);
+const ARQ = process.argv[3] || 'trilha.wav';
+/* escala do arranjo: 1 a partir de 100 s; abaixo disso, tudo entra e sai mais cedo */
+const E = Math.min(1, Math.max(.3, DUR / 100));
 
 const L = new Float64Array(N), R = new Float64Array(N);
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
@@ -126,7 +132,7 @@ for (let b = 0; b < nBlocos; b++) {
   const t0 = b * BLOCO;
 
   /* o filme abre quase no silêncio e a trilha vai entrando */
-  const corpo = ramp(t0, 0, 12) * (1 - ramp(t0, DUR - 9, DUR - 2));
+  const corpo = ramp(t0, 0, 12 * E) * (1 - ramp(t0, DUR - 9 * E, DUR - 2 * E));
 
   for (let c = 0; c < 2; c++) {
     const tc = t0 + c * COMPASSO;
@@ -144,12 +150,12 @@ for (let b = 0; b < nBlocos; b++) {
   /* uma nota solta por bloco, só para o ouvido ter onde pousar */
   if (b % 2 === 1) {
     const tm = t0 + COMPASSO + 2 * BAT;
-    const abre = ramp(t0, 16, 34) * (1 - ramp(t0, DUR - 16, DUR - 6));
+    const abre = ramp(t0, 16 * E, 34 * E) * (1 - ramp(t0, DUR - 16 * E, DUR - 6 * E));
     rhodes(tm, mtof(ac.mel[b % ac.mel.length]), .050 * corpo * abre, .30, 3.2);
   }
 
   /* batida: entra tarde, sai cedo e fica sempre embaixo de tudo */
-  const bat = ramp(t0, 18, 30) * (1 - ramp(t0, DUR - 20, DUR - 10)) * corpo;
+  const bat = ramp(t0, 18 * E, 30 * E) * (1 - ramp(t0, DUR - 20 * E, DUR - 10 * E)) * corpo;
   if (bat > .001) {
     for (let c = 0; c < 2; c++) {
       const tc = t0 + c * COMPASSO;
@@ -290,7 +296,7 @@ for (let i = 0; i < N; i++) {
   buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(l * 32767))), 44 + i * 4);
   buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(r * 32767))), 46 + i * 4);
 }
-const saida = path.join(dir, '..', 'out', 'trilha.wav');
+const saida = path.join(dir, '..', 'out', ARQ);
 fs.writeFileSync(saida, buf);
 const rms = Math.sqrt(somaQ / (N * 2));
 console.log(`trilha lo-fi: ${DUR}s · ${BPM} bpm · ${nBlocos} acordes · ` +
