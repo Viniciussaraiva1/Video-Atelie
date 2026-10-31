@@ -117,7 +117,8 @@ primeira mensagem.
 - **Corte vertical, 43,5 s, 1080×1920**, para Reels, Stories e Status do
   WhatsApp: gancho no primeiro quadro, uma frase grande por cena (a maioria
   assiste sem som) e tudo longe da faixa que o Instagram cobre embaixo.
-- A trilha lo-fi se ajusta sozinha a filmes curtos.
+- A trilha dos dois filmes é a música "Vitrine (jazz house)", cortada no tempo
+  da batida para caber em cada duração.
 - Os dois filmes ganharam o estilo tátil em galeria: a cor, os modelos e o
   estudo correm como galeria em movimento, e os destaques são letras de
   massinha, pasta, papel-alumínio e uma bolha de plástico no cartaz final

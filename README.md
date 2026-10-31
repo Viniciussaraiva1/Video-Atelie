@@ -43,10 +43,10 @@ Tudo é feito em JavaScript, sem banco de imagens:
   táteis e as fotos da galeria são iluminadas pixel a pixel em `src/js/tatil.js`);
 - **movimento** — uma linha do tempo determinística: `seek(t)` desenha o quadro
   exato do instante `t`, sem depender de relógio ou de `requestAnimationFrame`;
-- **som** — trilha lo-fi sintetizada em JavaScript puro (`scripts/music.mjs`):
-  piano elétrico abafado, baixo redondo, uma batida quase só sentida, ondulação
-  de fita e chiado de vinil. É ambientação: fica embaixo da imagem e não disputa
-  com ela;
+- **som** — a música "Vitrine (jazz house)" (`audio/vitrine-jazz-house.mp3`),
+  encaixada na duração de cada filme por `scripts/faixa.mjs`. A trilha lo-fi
+  sintetizada antiga (`scripts/music.mjs`) continua no repositório como
+  alternativa;
 - **montagem** — Playwright fotografa quadro a quadro e joga tudo num cano para o
   ffmpeg, que fecha o MP4 na mesma passada.
 
@@ -57,14 +57,21 @@ npm install
 npm run video                                   # o filme, sai mudo, ~10 min
 npm run vertical                                # o corte vertical, ~4 min
 
-node scripts/music.mjs 111                      # out/trilha.wav, no total do filme
-node scripts/music.mjs 43.5 trilha-vertical.wav # trilha do corte vertical
-node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha.wav
-node scripts/mux.mjs atelie-digital-vertical.mp4 trilha-vertical.wav
+node scripts/faixa.mjs                          # out/trilha-jazz.wav e trilha-jazz-vertical.wav
+node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha-jazz.wav
+node scripts/mux.mjs atelie-digital-vertical.mp4 trilha-jazz-vertical.wav
 ```
 
+A música tem 1 min 46 s a 120 bpm. No filme principal, `faixa.mjs` pula os 3 s
+de entrada e repete quatro compassos do meio, com os cortes em cima da batida,
+e o fim da música cai no fim do filme. No vertical, ela começa aos 32,5 s, onde
+a música abre, e sai em 2,5 s. As duas ficam em −16 LUFS. Para voltar à trilha
+sintetizada: `node scripts/music.mjs 111` e `node scripts/mux.mjs
+atelie-digital-como-funciona.mp4 trilha.wav` (e `music.mjs 43.5
+trilha-vertical.wav` para o vertical).
+
 O render sai mudo de propósito e a trilha entra por cima: assim dá para mexer na
-música sem refazer os quadros. Em filme curto, a trilha encolhe a entrada da
+música sem refazer os quadros. Em filme curto, a trilha sintetizada encolhe a entrada da
 batida junto. Para tirar a música de volta:
 
 ```bash
@@ -136,11 +143,12 @@ aplicativo cobre com o nome do perfil, a legenda e os botões.
 | o que cada cena do filme faz e quando | `src/js/scenes.js`, `src/js/scenes2.js` |
 | as cenas do corte vertical | `src/js/vertical.js`, `src/css/vertical.css` |
 | duração, dissolvência, rótulos e legendas | `src/js/timeline.js` |
-| harmonia, melodia e mistura da trilha | `scripts/music.mjs` |
+| onde a música é cortada em cada filme | `scripts/faixa.mjs` |
+| harmonia, melodia e mistura da trilha sintetizada | `scripts/music.mjs` |
 
 Mudou a duração de alguma cena? Nada mais precisa ser ajustado: a linha do tempo
-soma as durações sozinha, e a trilha aceita o novo total em
-`node scripts/music.mjs <segundos>`.
+soma as durações sozinha. A música, essa sim, precisa de outro corte em
+`scripts/faixa.mjs` (quantos compassos repetir), já que ela tem duração fixa.
 
 ## Decisões de conteúdo
 
@@ -161,11 +169,10 @@ soma as durações sozinha, e a trilha aceita o novo total em
   preço vezes a quantidade que a loja já ia comprar: R$ 1.035 no mês, três
   vezes a mensalidade. A linha de preço usa a faixa da própria série, com piso
   de 14 % — preço parado desenha linha reta, e não serra.
-- **A trilha é ambientação, não tema.** Roda de jazz em dó maior a 72 bpm, pico
-  em −6,7 dBFS e nível médio perto de −25 dBFS. Medida com ponderação A, a faixa
-  abaixo de 120 Hz responde por menos de 1 % do que se ouve. No filme, a batida
-  entra aos 18 s e sai 20 s antes do fim; no corte vertical, tudo isso encolhe
-  na mesma proporção.
+- **A música entra inteira, sem mudar andamento nem tom.** Para caber nos
+  filmes, ela só é cortada e emendada em cima da batida. Fica em −16 LUFS, mais
+  alta que a trilha sintetizada de antes (perto de −22), porque agora é a
+  música que segura o filme sem narração.
 
 ## Créditos técnicos
 
