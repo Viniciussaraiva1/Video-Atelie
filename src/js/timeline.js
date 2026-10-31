@@ -2,6 +2,9 @@
    Linha do tempo. Monta as cenas, encadeia as dissolvências e
    expõe seek(t): dado um instante, desenha o quadro exato.
    O renderizador chama seek() 30 vezes por segundo de vídeo.
+
+   As cenas só são montadas depois que as fontes carregam: as letras
+   táteis são desenhadas em canvas com elas, uma vez, na montagem.
 ----------------------------------------------------------------*/
 const TL = (() => {
 
@@ -18,7 +21,8 @@ const TL = (() => {
     cap: document.getElementById('caption'),
     mark: document.getElementById('mark'),
     prog: document.querySelector('#progress i'),
-    barra: document.getElementById('progress')
+    barra: document.getElementById('progress'),
+    folio: document.getElementById('folio')
   };
   const veil = document.getElementById('veil');
 
@@ -28,20 +32,29 @@ const TL = (() => {
   let acc = 0;
   cenas.forEach(c => { ini.push(acc); acc += c.dur; });
   const TOTAL = acc;
+  const ultimoNum = cenas.map(c => c.num).filter(Boolean).pop() || '';
 
-  /* monta o DOM de todas as cenas uma única vez */
-  cenas.forEach((c, i) => {
-    const s = document.createElement('div');
-    s.className = 'scene';
-    s.id = 'sc-' + c.id;
-    palco.appendChild(s);
-    c.el = s;
-    c.build(s);
-  });
+  /* monta o DOM de todas as cenas uma única vez, com o grão do papel por cima */
+  let montado = false;
+  function montar() {
+    cenas.forEach(c => {
+      const s = document.createElement('div');
+      s.className = 'scene';
+      s.id = 'sc-' + c.id;
+      palco.appendChild(s);
+      c.el = s;
+      c.build(s);
+    });
+    const g = Galeria.grao(512, 512);
+    const grao = document.getElementById('grao');
+    if (grao) grao.style.backgroundImage = `url(${g.toDataURL()})`;
+    montado = true;
+  }
 
   let rotuloAtual = -1;
 
   function seek(t) {
+    if (!montado) return;
     t = Math.max(0, Math.min(TOTAL, t));
 
     cenas.forEach((c, i) => {
@@ -73,6 +86,8 @@ const TL = (() => {
       chrome.txt.textContent = c.label || '';
       chrome.cap.textContent = c.caption || '';
       chrome.sep.style.display = c.num ? '' : 'none';
+      if (chrome.folio) chrome.folio.textContent = c.num ? `${c.num} / ${ultimoNum}` : '';
+      document.getElementById('stage').dataset.cena = c.id;
     }
     const temRotulo = !!c.label;
     chrome.bloco.style.opacity = temRotulo ? vis : 0;
@@ -83,12 +98,13 @@ const TL = (() => {
                  * (1 - FX.smooth(FX.span(t, ini[cenas.length - 1] - .9, ini[cenas.length - 1] + .2)));
     chrome.mark.style.opacity = dentro * .999;
     chrome.barra.style.opacity = dentro;
+    if (chrome.folio) chrome.folio.style.opacity = c.num ? vis : 0;
     chrome.prog.style.width = (t / TOTAL * 100) + '%';
 
     veil.style.opacity = FX.smooth(FX.span(t, TOTAL - FIM, TOTAL - .12));
   }
 
-  return { seek, TOTAL, ini, cenas };
+  return { seek, montar, TOTAL, ini, cenas };
 })();
 
 /* ---- ganchos do renderizador ---- */
@@ -97,7 +113,12 @@ window.__W = document.getElementById('stage').clientWidth;
 window.__H = document.getElementById('stage').clientHeight;
 window.__seek = t => TL.seek(t);
 window.__ready = false;
-document.fonts.ready.then(() => { TL.seek(0); requestAnimationFrame(() => { window.__ready = true; }); });
+const FONTES = ["400 100px 'Bagel Fat One'", '400 100px Anton', '400 100px Playfair', 'italic 400 100px Playfair',
+                '900 100px Playfair', '400 100px Inter', '700 100px Inter', '400 100px PlexMono', '500 100px PlexMono'];
+const pronto = Promise.all(FONTES.map(f => document.fonts.load(f)))
+  .then(() => document.fonts.ready)
+  .then(() => { TL.montar(); TL.seek(0); });
+pronto.then(() => requestAnimationFrame(() => { window.__ready = true; }));
 
 /* ---- prévia no navegador: ?play para rodar, setas para catar quadro ---- */
 if (location.search.includes('play')) {
@@ -107,7 +128,7 @@ if (location.search.includes('play')) {
     TL.seek(t);
     requestAnimationFrame(loop);
   };
-  document.fonts.ready.then(loop);
+  pronto.then(loop);
 } else if (location.search.includes('t=')) {
-  document.fonts.ready.then(() => TL.seek(parseFloat(location.search.split('t=')[1])));
+  pronto.then(() => TL.seek(parseFloat(location.search.split('t=')[1])));
 }

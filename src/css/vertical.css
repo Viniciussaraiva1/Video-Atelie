@@ -57,3 +57,11 @@ html,body{width:1080px;height:1920px;}
   padding:22px 36px;font:500 19px/1 'PlexMono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);}
 .v-pill span svg{width:24px;height:24px;}
 .v-pill.cheia span{background:var(--ink);color:var(--paper);}
+
+/* estilo tátil no vertical */
+.v-cartaz{left:0;width:100%;text-align:center;font-size:86px;}
+.v-fecho{left:62px;top:150px;font-size:236px;}
+.v-cta-pill{left:70px;top:1330px;background:#151210;color:#f3e7d3;}
+.miudo.v-m1{left:70px;top:96px;}
+.miudo.v-m2{left:600px;top:96px;}
+.v-precos .row .p{font:400 66px/1 'Anton','Inter',sans-serif;letter-spacing:.005em;}

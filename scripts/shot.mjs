@@ -13,7 +13,7 @@ const p = await b.newPage({ viewport: { width: 1920, height: 1080 }, deviceScale
 p.on('pageerror', e => console.error('ERRO NA PÁGINA:', e.message));
 p.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
 await p.goto('file://' + path.join(dir, '..', 'src', PAGINA));
-await p.waitForFunction('window.__ready===true', null, { timeout: 20000 });
+await p.waitForFunction('window.__ready===true', null, { timeout: 240000 });
 const [W, H] = await p.evaluate('[window.__W, window.__H]');
 await p.setViewportSize({ width: W, height: H });
 console.log('duração total:', await p.evaluate('window.__DUR'), 's', `· ${W}×${H}`);

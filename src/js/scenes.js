@@ -195,26 +195,72 @@ const SCENES = (() => {
   ==============================================================*/
   const list = [];
 
+  /* ---------- peças táteis compartilhadas pelas cenas ---------- */
+  const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const TIPOS = ['massa', 'letra', 'fio', 'tecido'];
+  /* uma foto tátil por cor, com nome de arquivo de tela de trabalho */
+  function fotosDeCor(cores, w, h, semente = 3) {
+    return cores.map((c, i) => {
+      const tipo = TIPOS[i % TIPOS.length];
+      const el = Galeria.foto(c.hex, tipo, w, h, semente + i * 7, { ch: c.nome[0] });
+      return { el, w, h, arq: `${c.hex.slice(1)}_${slug(c.nome)}.png`, cor: c };
+    });
+  }
+
+  /* letras de massinha que caem e assentam, uma depois da outra */
+  function letrasQueCaem(pai, txt, o) {
+    const L = Tatil.letras(txt, o);
+    const box = put(pai, 'div', 'tatil-linha');
+    Object.assign(box.style, { left: o.x + 'px', top: o.y + 'px' });
+    const els = L.map(l => {
+      l.c.className = 'tatil-letra';
+      Object.assign(l.c.style, { left: (l.x - l.pad) + 'px', top: (-l.pad) + 'px' });
+      box.appendChild(l.c);
+      return l;
+    });
+    box._L = els; box._larg = L.largura;
+    return box;
+  }
+  function cai(box, t, t0, passo = .07, alt = 140) {
+    box._L.forEach((l, i) => {
+      const a = t0 + i * passo;
+      const k = F.span(t, a, a + .42);
+      const y = -alt * (1 - k * k);                                 /* cai acelerando */
+      const q = F.span(t, a + .42, a + .95);                        /* e amassa ao tocar o papel */
+      const am = Math.sin(q * Math.PI) * (1 - q * .4) * (q > 0 && q < 1 ? 1 : 0);
+      l.c.style.opacity = F.clamp(k * 3);
+      l.c.style.transformOrigin = `50% ${l.pad + (l.h - 2 * l.pad) * .82}px`;
+      l.c.style.transform = `translateY(${y.toFixed(1)}px) scale(${(1 + .16 * am).toFixed(3)},${(1 - .2 * am).toFixed(3)})`;
+    });
+  }
+
   /* ---------- abertura ---------- */
   list.push({
-    id: 'abertura', dur: 4.5, label: null, caption: null,
+    id: 'abertura', dur: 5.0, label: null, caption: null,
     build(s) {
-      const c = put(s, 'div', 'center'); c.style.top = '352px';
-      s._k = put(c, 'div', 'kicker', 'Vitrines para boutiques que vendem pelo Instagram');
-      s._t = put(c, 'div', 'display');
-      Object.assign(s._t.style, { fontSize: '154px', marginTop: '46px', fontStyle: 'italic', letterSpacing: '-.03em' });
-      s._t.innerHTML = 'Ateliê Digital';
-      s._r = put(c, 'div', 'hair'); Object.assign(s._r.style, { width: '0px', marginTop: '54px' });
-      s._s = put(c, 'div');
-      Object.assign(s._s.style, { font: "italic 400 32px/1.4 'Playfair',serif", color: 'rgba(23,22,20,.6)', marginTop: '40px' });
-      s._s.textContent = 'a sua loja respondendo por você';
+      const cores = [].concat(...DATA.grupos.map(g => g.cores)).concat(DATA.modelos.map(m => ({ nome: m.nome, hex: m.cor })));
+      const itens = fotosDeCor(cores.slice(0, 22), 210, 250, 41);
+      s._g = Galeria.cria(s, itens, {
+        etapas: [{ arranjo: 'espiral', op: { raio: 360, largura: 2300, passo: .5, vel: .32, sobe: -120 } }],
+        camera: t => ({ x: Math.sin(t * .3) * 40, y: -290, z: 0, giro: -.06 }),
+        foco: t => F.lerp(-260, 120, F.smooth(F.span(t, 0, 5))), dof: .016,
+        linha: t => .85 * F.smooth(F.span(t, .4, 1.6)),
+        fios: t => .7 * F.smooth(F.span(t, 1.2, 2.4)), fiosDe: [3, 4, 5, 6, 7, 8],
+        ancora: () => [300, 1000],
+        entrada: (i, t) => F.smooth(F.span(t, .05 + i * .05, .45 + i * .05)),
+        soltos: [{ x: -760, y: -300, z: 0, tam: 34, cor: '#e04a6b' }, { x: 820, y: 220, z: 300, tam: 44, cor: '#1e2a8a' },
+                 { x: -880, y: 330, z: -200, tam: 26, cor: '#3e8a80' }]
+      });
+      s._k = put(s, 'div', 'kicker abre-k', 'Vitrines para boutiques que vendem pelo Instagram');
+      s._t = letrasQueCaem(s, 'Ateliê Digital', { material: 'argila', cor: '#d4553c', tam: 190, fonte: 'massa', x: 0, y: 236 });
+      s._t.style.left = (960 - s._t._larg / 2) + 'px';
+      s._s = put(s, 'div', 'abre-s', 'a sua loja respondendo por você');
     },
     update(s, t) {
-      fade(s._k, F.outQuint(F.span(t, .15, 1.1)));
-      const k = F.outQuint(F.span(t, .35, 1.9));
-      s._t.style.opacity = k; s._t.style.transform = `translateY(${(1 - k) * 28}px)`;
-      s._r.style.width = (F.ease(F.span(t, 1.3, 2.5)) * 430) + 'px';
-      fade(s._s, F.outQuint(F.span(t, 1.9, 3.1)));
+      s._g.pose(t);
+      fade(s._k, F.outQuint(F.span(t, .1, .9)));
+      cai(s._t, t, .45, .06);
+      fade(s._s, F.outQuint(F.span(t, 1.9, 2.9)));
     }
   });
 
@@ -223,10 +269,12 @@ const SCENES = (() => {
     id: 'problema', num: '01', label: 'O problema', dur: 7.0,
     caption: 'A cliente chega pelo Instagram e pergunta o que já podia estar escrito na página.',
     build(s) {
-      const b = put(s, 'div', 'display');
-      Object.assign(b.style, { position: 'absolute', left: '84px', top: '300px', width: '900px', fontSize: '92px' });
-      b.innerHTML = 'Você não vende pouco.<br><em>Você responde demais.</em>';
+      const b = put(s, 'div', 'cartaz');
+      Object.assign(b.style, { left: '84px', top: '232px', fontSize: '92px' });
+      b.innerHTML = 'Você não vende pouco.<br>Você';
       s._b = b;
+      s._r = letrasQueCaem(s, 'responde', { material: 'argila', cor: '#d4553c', tam: 168, fonte: 'massa', x: 78, y: 430 });
+      s._d = letrasQueCaem(s, 'demais.', { material: 'argila', cor: '#d4553c', tam: 168, fonte: 'massa', x: 78, y: 610 });
       const ph = UI.phone(s, { x: 1348, y: 200, scale: 1.02 });
       const dm = put(ph.screen, 'div', 'dm');
       const top = put(dm, 'div', 'dm-top', '<span>Direct</span>');
@@ -243,8 +291,10 @@ const SCENES = (() => {
       s._lista = lista; s._ph = ph;
     },
     update(s, t) {
-      const k = F.outQuint(F.span(t, .3, 1.8));
+      const k = F.outQuint(F.span(t, .2, 1.2));
       s._b.style.opacity = k; s._b.style.transform = `translateY(${(1 - k) * 24}px)`;
+      cai(s._r, t, 1.0, .07);
+      cai(s._d, t, 1.6, .07);
       const pk = F.outQuint(F.span(t, .1, 1.4));
       s._ph.root.style.opacity = pk;
       s._ph.root.style.transform = `scale(1.02) translateY(${(1 - pk) * 30}px)`;
@@ -307,5 +357,6 @@ const SCENES = (() => {
     }
   });
 
-  return { list, mesaScene, buildMesa, resolve, paintPanel, scrollPara, put, pt, rise, fade, blendHex, LOJA, MESA, ST0 };
+  return { list, mesaScene, buildMesa, resolve, paintPanel, scrollPara, put, pt, rise, fade, blendHex, LOJA, MESA, ST0,
+           slug, fotosDeCor, letrasQueCaem, cai };
 })();

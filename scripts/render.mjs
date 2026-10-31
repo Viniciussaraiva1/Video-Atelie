@@ -33,7 +33,7 @@ const nav = await chromium.launch({
 const pag = await nav.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
 pag.on('pageerror', e => { console.error('ERRO NA PÁGINA:', e.message); process.exitCode = 1; });
 await pag.goto('file://' + path.join(raiz, 'src', PAGINA));
-await pag.waitForFunction('window.__ready===true', null, { timeout: 30000 });
+await pag.waitForFunction('window.__ready===true', null, { timeout: 240000 });
 const [W, H] = await pag.evaluate('[window.__W, window.__H]');
 await pag.setViewportSize({ width: W, height: H });
 

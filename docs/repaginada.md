@@ -109,15 +109,19 @@ primeira mensagem.
 
 ### Neste repositório
 
-- **Filme principal, 1 min 46 s (antes 2 min 25 s).** A mesa passou de seis
+- **Filme principal, 1 min 51 s (antes 2 min 25 s).** A mesa passou de seis
   cenas para três. Entraram a prévia grátis, a cena de preço em dois passos, a
   cena "sem risco" e um fechamento que pede as cinco fotos. Os doze modelos
   são os mesmos da página, com nome, fundo e cor. O radar ganhou a conta do
   mês: R$ 1.035 achados contra R$ 340 de mensalidade.
-- **Corte vertical, 42 s, 1080×1920**, para Reels, Stories e Status do
+- **Corte vertical, 43,5 s, 1080×1920**, para Reels, Stories e Status do
   WhatsApp: gancho no primeiro quadro, uma frase grande por cena (a maioria
   assiste sem som) e tudo longe da faixa que o Instagram cobre embaixo.
 - A trilha lo-fi se ajusta sozinha a filmes curtos.
+- Os dois filmes ganharam o estilo tátil em galeria: a cor, os modelos e o
+  estudo correm como galeria em movimento, e os destaques são letras de
+  massinha, pasta, papel-alumínio e uma bolha de plástico no cartaz final
+  (detalhes no README).
 
 ### Na página do Ateliê
 

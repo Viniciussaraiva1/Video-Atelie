@@ -23,11 +23,16 @@
   src:url('../fonts/plexmono-normal-500-latin-ext.woff2') format('woff2');unicode-range:U+0100-02AF,U+1E00-1EFF;}
 @font-face{font-family:'Inter';font-style:normal;font-weight:300 700;font-display:block;
   src:url('../fonts/inter-normal-300_700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F;}
+/* as duas fontes das letras táteis: Bagel Fat One vira massinha, Anton é o tipo de cartaz */
+@font-face{font-family:'Bagel Fat One';font-style:normal;font-weight:400;font-display:block;
+  src:url('../fonts/bagelfatone-normal-400.ttf') format('truetype');}
+@font-face{font-family:'Anton';font-style:normal;font-weight:400;font-display:block;
+  src:url('../fonts/anton-normal-400.ttf') format('truetype');}
 @font-face{font-family:'Inter';font-style:normal;font-weight:300 700;font-display:block;
   src:url('../fonts/inter-normal-300_700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02AF,U+1E00-1EFF;}
 
 :root{
-  --paper:#faf7f1;
+  --paper:#ece7e0;
   --ink:#171614;
   --ink-60:rgba(23,22,20,.60);
   --ink-42:rgba(23,22,20,.42);
@@ -53,8 +58,11 @@ body{-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;}
 #label-num{opacity:.45;}
 #mark{position:absolute;right:84px;top:76px;font:400 13px/1 'PlexMono',monospace;letter-spacing:.42em;
   text-transform:uppercase;color:var(--ink-42);}
-#caption{position:absolute;left:84px;bottom:86px;width:1060px;font:400 31px/1.42 'Playfair',serif;
-  font-style:italic;color:var(--ink-60);}
+#caption{position:absolute;left:84px;bottom:86px;width:1040px;font:400 27px/1.45 'Inter',sans-serif;
+  color:rgba(23,22,20,.74);letter-spacing:-.005em;}
+#folio{position:absolute;right:84px;bottom:92px;font:500 14px/1 'PlexMono',monospace;letter-spacing:.24em;color:var(--ink-42);}
+/* grão de papel por cima de tudo: a tela não fica lisa de computador */
+#grao{position:absolute;inset:0;pointer-events:none;background-size:512px 512px;opacity:.9;}
 #progress{position:absolute;left:0;bottom:0;width:100%;height:2px;background:rgba(23,22,20,.07);}
 #progress i{display:block;height:100%;width:0;background:var(--ink-42);}
 
@@ -381,3 +389,59 @@ body{-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;}
 .inclusos span{display:flex;align-items:center;gap:12px;font:500 12.5px/1 'PlexMono',monospace;letter-spacing:.18em;
   text-transform:uppercase;color:var(--ink-60);opacity:0;}
 .inclusos span::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink-42);}
+
+/* ---------------------------------------------------------------
+   Estilo tátil e galeria em movimento
+----------------------------------------------------------------*/
+/* tipo de cartaz: grotesca condensada, em caixa alta */
+.cartaz{position:absolute;font-family:'Anton','Inter',sans-serif;text-transform:uppercase;line-height:1.14;
+  color:var(--ink);letter-spacing:.004em;}
+.tatil-linha{position:absolute;width:0;height:0;}
+.tatil-letra{position:absolute;display:block;opacity:0;}
+
+.abre-k{position:absolute;left:0;width:100%;text-align:center;top:188px;}
+.abre-s{position:absolute;left:0;width:100%;text-align:center;top:506px;font:italic 400 34px/1.3 'Playfair',serif;
+  color:var(--ink-60);}
+
+/* a galeria: peças, números, nome do arquivo, linha-guia e fios */
+.galeria{position:absolute;inset:0;z-index:0;}
+.galeria .peca{position:absolute;left:0;top:0;transform-origin:50% 50%;box-shadow:0 22px 46px rgba(23,22,20,.16);}
+.galeria .peca>canvas{display:block;}
+.galeria .peca .pn{position:absolute;left:2px;top:calc(100% + 10px);font:400 24px/1 'Inter',sans-serif;color:var(--ink);
+  white-space:nowrap;letter-spacing:-.01em;}
+.galeria .peca .pa{position:absolute;left:12px;bottom:12px;font:500 11px/1 'PlexMono',monospace;
+  color:rgba(23,22,20,.62);white-space:nowrap;letter-spacing:.02em;}
+.galeria svg.guia{position:absolute;left:0;top:0;z-index:9000;pointer-events:none;overflow:visible;}
+.galeria svg.guia path{stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;}
+.galeria svg.guia path.fios{stroke:rgba(23,22,20,.5);stroke-width:1.2;}
+.galeria svg.guia circle{fill:#fff;stroke:var(--ink);stroke-width:1.5;}
+.galeria .solto{position:absolute;left:0;top:0;}
+.galeria .thumb{position:relative;width:300px;height:220px;}
+
+/* ficha do tom escolhido e números do estudo */
+.ficha-k{position:absolute;}
+.ficha-t{position:absolute;width:840px;font:400 30px/1.4 'Inter',sans-serif;color:var(--ink);}
+.num-k{position:absolute;width:320px;text-align:center;}
+
+.fotos .ft{position:relative;}
+.fotos .ft .fn{position:absolute;left:9px;bottom:7px;font:400 16px/1 'Inter',sans-serif;color:var(--ink);}
+.conta .eco{display:block;}
+.step .step-n{display:block;}
+.pcard .p{font:400 72px/1 'Anton','Inter',sans-serif;letter-spacing:.005em;}
+.pcard .p small{font:400 19px/1 'Inter',sans-serif;}
+
+/* o cartaz do fechamento */
+.cena-cartaz{background:#d9492c;}
+.cartaz-fecho{position:absolute;left:76px;top:92px;font:400 268px/.9 'Anton','Inter',sans-serif;text-transform:uppercase;
+  color:#151210;letter-spacing:-.004em;white-space:nowrap;}
+.lente{position:absolute;inset:0;pointer-events:none;}
+.bolha{position:absolute;left:0;top:0;}
+.cartaz-cta{position:absolute;left:1116px;top:842px;display:inline-flex;align-items:center;gap:14px;background:#151210;
+  border-radius:999px;padding:19px 30px;font:500 16px/1 'PlexMono',monospace;letter-spacing:.18em;text-transform:uppercase;
+  color:#f3e7d3;}
+.cartaz-cta svg{width:22px;height:22px;}
+.miudo{position:absolute;font:500 13px/1.5 'PlexMono',monospace;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(21,18,16,.8);}
+.miudo.m1{left:1290px;top:96px;}
+.miudo.m2{left:1600px;top:96px;}
+.miudo.m3{right:64px;bottom:58px;}

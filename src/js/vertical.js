@@ -4,6 +4,10 @@
    quem rola o feed: o gancho no primeiro segundo, a vitrine, a
    prévia grátis, o preço e o convite. Cada cena tem uma frase só,
    grande, porque a maioria assiste sem som.
+
+   O estilo é o do filme: letras táteis (massinha, papel-alumínio,
+   uma bolha de plástico no cartaz final) e a cor mostrada como
+   galeria em movimento, subindo pela tela numa espiral.
 ----------------------------------------------------------------*/
 window.ROTEIRO = (() => {
   const S = SCENES, put = S.put, F = FX;
@@ -79,8 +83,12 @@ window.ROTEIRO = (() => {
   L.push({
     id: 'v-gancho', dur: 6.0,
     build(s) {
-      s._t = titulo(s, 'Você não vende pouco.<br><em>Você responde demais.</em>');
-      const ph = celular(s);
+      s._t = put(s, 'div', 'cartaz v-cartaz', 'Você não vende pouco.<br>Você');
+      posta(s._t, 236);
+      s._r = S.letrasQueCaem(s, 'responde', { material: 'argila', cor: '#d4553c', tam: 150, fonte: 'massa', x: 0, y: 418 });
+      s._d = S.letrasQueCaem(s, 'demais.', { material: 'argila', cor: '#d4553c', tam: 150, fonte: 'massa', x: 0, y: 580 });
+      [s._r, s._d].forEach(b => { b.style.left = (540 - b._larg / 2) + 'px'; });
+      const ph = celular(s, 920, 1.0);
       const dm = put(ph.screen, 'div', 'dm');
       const top = put(dm, 'div', 'dm-top', '<span>Direct</span>');
       s._ct = put(top, 'span', null, '0 hoje');
@@ -98,7 +106,10 @@ window.ROTEIRO = (() => {
     update(s, t) {
       /* o título já está na tela no primeiro quadro, que vira a capa do Reels */
       entra(s._t, t, -.7, .8, 18);
-      entraCel(s._ph, t, .15);
+      /* a massinha já assentou no primeiro quadro; ainda amassa um pouco no começo */
+      S.cai(s._r, t, -1.0, .05, 90);
+      S.cai(s._d, t, -.8, .05, 90);
+      entraCel(s._ph, t, .3);
       /* mensagens caindo, uma a cada meio segundo */
       const t0 = .6, step = .48;
       s._rows.forEach((r, i) => {
@@ -145,57 +156,37 @@ window.ROTEIRO = (() => {
     }
   });
 
-  /* ---------- 3 · monte a sua ---------- */
-  const TROCAS = [
-    { t: 1.5, ctrl: 'cor',   nome: 'Bordô',         fundo: '#faf7f1', cor: '#5e1f2b', letra: 0 },
-    { t: 2.8, ctrl: 'fundo', nome: 'Areia',         fundo: '#efe5d7', cor: '#5e1f2b', letra: 0 },
-    { t: 4.1, ctrl: 'letra', nome: 'Direto',        fundo: '#efe5d7', cor: '#5e1f2b', letra: 3 },
-    { t: 5.4, ctrl: 'cor',   nome: 'Neptune Green', fundo: '#efe5d7', cor: '#3e8a80', letra: 3 }
-  ];
+  /* ---------- 3 · a cor, em galeria ---------- */
   L.push({
-    id: 'v-monte', dur: 7.5,
+    id: 'v-cor', dur: 8.5,
     build(s) {
-      s._t = titulo(s, 'Monte a sua<br><em>e veja na hora.</em>');
-      const ph = celular(s);
-      s._v = vitrine(ph.screen);
-      s._ph = ph;
-      const box = posta(put(s, 'div', 'v-chips'), 1450);
-      s._ch = {};
-      [['cor', 'Cor', 'Muted Clay'], ['fundo', 'Fundo', 'Papel'], ['letra', 'Letra', 'Editorial']].forEach(([id, r, v]) => {
-        const c = put(box, 'div', 'v-chip');
-        put(c, 'i', null, r);
-        c._b = put(c, 'b', null, v);
-        c._v0 = v;
-        s._ch[id] = c;
+      s._t = titulo(s, 'Escolha a cor<br><em>e veja na hora.</em>');
+      const cores = [].concat(...DATA.grupos.map(g => g.cores));
+      const itens = S.fotosDeCor(cores, 200, 240, 5);
+      const grade = { cols: 4, w: 200, h: 240, gx: 26, gy: 72, z: 260, y: 160 };
+      s._g = Galeria.cria(s, itens, {
+        W: 1080, H: 1920,
+        etapas: [
+          { arranjo: 'linha', op: { x: 0, y: 1700, passo: 10, z: 200 } },
+          { t: .1, arranjo: 'espiral', op: { eixo: 'y', raio: 290, largura: 960, passo: .55, vel: .35, sobe: 0, z: 150 }, passo: .05, dur: 1.2 },
+          { t: 3.6, arranjo: 'grade', op: grade, passo: .04, dur: 1.1 },
+          { t: 6.0, arranjo: 'destaque', op: { i: 0, x: 0, y: 40, z: -420, resto: 'grade', restoOp: grade, recua: 1200 }, passo: 0, dur: 1.0 }
+        ],
+        camera: t => ({ x: 0, y: -250 * (1 - F.smooth(F.span(t, 3.4, 4.6))), z: 0, giro: 0 }),
+        foco: t => t < 3.5 ? F.lerp(-100, 200, F.smooth(F.span(t, .5, 3.4))) : (t < 6 ? 260 : -420), dof: .013,
+        linha: t => .9 * F.smooth(F.span(t, .8, 1.6)) * (1 - F.smooth(F.span(t, 3.5, 4.1))),
+        rotulos: t => 1 - F.smooth(F.span(t, 6.0, 6.5)) * .85,
+        entrada: (i, t) => i === 0 ? 1 : 1 - .85 * F.smooth(F.span(t, 6.0, 6.8))
       });
-      s._box = box;
+      s._nome = S.letrasQueCaem(s, 'Muted Clay', { material: 'argila', cor: cores[0].hex, tam: 128, fonte: 'massa', x: 0, y: 1330 });
+      s._nome.style.left = (540 - s._nome._larg / 2) + 'px';
+      s._hx = posta(put(s, 'div', 'kicker v-k', 'c08a78 · terrosos · carta 26/27'), 1530);
     },
     update(s, t) {
       entra(s._t, t, .1);
-      entraCel(s._ph, t, .2);
-      entra(s._box, t, .7, 1.0, 16);
-      /* estado da vitrine: a última troca já feita, com a cor passando em 0,35 s */
-      let fundo = '#faf7f1', cor = COR, letra = 0, antes = null, quando = -9;
-      const ultima = {};
-      TROCAS.forEach(x => {
-        if (x.t > t) return;
-        antes = { fundo, cor }; quando = x.t;
-        fundo = x.fundo; cor = x.cor; letra = x.letra;
-        ultima[x.ctrl] = x;
-      });
-      if (antes) {
-        const k = F.smooth(F.span(t, quando, quando + .35));
-        fundo = S.blendHex(antes.fundo, fundo, k);
-        cor = S.blendHex(antes.cor, cor, k);
-      }
-      s._v.pinta(fundo, cor, letra);
-      /* o controle que acabou de mudar acende */
-      Object.keys(s._ch).forEach(id => {
-        const c = s._ch[id], x = ultima[id];
-        c._b.textContent = x ? x.nome : c._v0;
-        const aceso = TROCAS.some(y => y.ctrl === id && t >= y.t && t < y.t + 1.2);
-        c.classList.toggle('on', aceso);
-      });
+      s._g.pose(t);
+      S.cai(s._nome, t, 6.4, .05, 90);
+      S.fade(s._hx, F.span(t, 7.0, 7.6));
     }
   });
 
@@ -259,25 +250,43 @@ window.ROTEIRO = (() => {
     }
   });
 
-  /* ---------- 6 · o convite ---------- */
+  /* ---------- 6 · o convite: o cartaz ---------- */
   L.push({
-    id: 'v-cta', dur: 6.0,
+    id: 'v-cta', dur: 6.5,
     build(s) {
-      s._k = posta(put(s, 'div', 'kicker v-k', 'Comece pela prévia grátis'), 500);
-      s._t = titulo(s, 'Me manda<br>cinco peças.<br><em>Eu devolvo<br>a sua vitrine.</em>', 580, 112);
-      s._p = posta(put(s, 'div', 'v-pill cheia',
-        `<span>${Draw.whats('#faf7f1', 24)}Prévia grátis · ${DATA.previa.prazo}</span>`), 1150);
-      s._s = posta(put(s, 'div', 'kicker v-k', 'chame no direct ou no WhatsApp'), 1270);
-      s._m = posta(put(s, 'div', 'v-k'), 1350);
-      Object.assign(s._m.style, { font: "italic 400 44px/1 'Playfair',serif", color: 'var(--ink)' });
-      s._m.textContent = 'Ateliê Digital';
+      s.classList.add('cena-cartaz');
+      const tipo = put(s, 'div', 'cartaz-fecho v-fecho', 'Me manda<br>cinco<br>peças.');
+      const lente = put(s, 'div', 'lente');
+      const tipo2 = tipo.cloneNode(true); lente.appendChild(tipo2);
+      const bw = 560, bh = 480;
+      const pts = Tatil.contorno(bw / 2, bh / 2, 200, 29, 80, .34);
+      const bolha = Tatil.forma(bw, bh, g => { Tatil.tracaContorno(g, pts); g.fill(); },
+        { material: 'vidro', cor: '#ffffff', tam: 280, sombraCor: '#5a1a0e', semente: 29 });
+      bolha.className = 'bolha';
+      s.appendChild(bolha);
+      s._t = tipo; s._t2 = tipo2; s._lente = lente; s._bolha = bolha; s._pts = pts; s._bw = bw; s._bh = bh;
+      s._dev = S.letrasQueCaem(s, 'Eu devolvo', { material: 'argila', cor: '#f3e7d3', tam: 112, fonte: 'massa', x: 70, y: 1010, sombraCor: '#5a1a0e', semente: 51 });
+      s._sua = S.letrasQueCaem(s, 'a sua vitrine.', { material: 'argila', cor: '#f3e7d3', tam: 112, fonte: 'massa', x: 70, y: 1140, sombraCor: '#5a1a0e', semente: 57 });
+      s._cta = put(s, 'div', 'cartaz-cta v-cta-pill', `${Draw.whats('#f3e7d3', 22)}<span>Prévia grátis · ${DATA.previa.prazo}</span>`);
+      s._miu = [put(s, 'div', 'miudo v-m1', 'Ateliê Digital<br>vitrines para boutiques'),
+                put(s, 'div', 'miudo v-m2', 'chame no direct<br>ou no WhatsApp')];
     },
     update(s, t) {
-      S.fade(s._k, F.outQuint(F.span(t, .1, 1.0)));
-      entra(s._t, t, .3, 1.4, 24);
-      entra(s._p, t, 1.6, 1.0, 16);
-      S.fade(s._s, F.span(t, 2.4, 3.2));
-      S.fade(s._m, F.span(t, 2.8, 3.6));
+      const k = F.outQuint(F.span(t, .1, 1.2));
+      s._t.style.opacity = k; s._t.style.transform = `translateY(${(1 - k) * 30}px)`;
+      s._lente.style.opacity = k;
+      const bx = 230 + Math.sin(t * .55 + .2) * 170, by = 300 + Math.cos(t * .45) * 160 + t * 18;
+      const kb = F.outQuint(F.span(t, .5, 1.6));
+      s._bolha.style.opacity = kb;
+      s._bolha.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px) scale(${(.9 + .1 * kb).toFixed(3)})`;
+      const cx = bx + s._bw / 2, cy = by + s._bh / 2;
+      s._lente.style.clipPath = `polygon(${s._pts.map(p => `${(p[0] + bx).toFixed(1)}px ${(p[1] + by).toFixed(1)}px`).join(',')})`;
+      s._t2.style.transformOrigin = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
+      s._t2.style.transform = `translateY(${((1 - k) * 30).toFixed(1)}px) scale(1.14)`;
+      S.cai(s._dev, t, 1.2, .05, 90);
+      S.cai(s._sua, t, 1.7, .05, 90);
+      S.rise([s._cta], t, 2.6, 0, .9, 16);
+      S.rise(s._miu, t, 3.0, .2, .8, 8);
     }
   });
 

@@ -1,10 +1,12 @@
 /* ---------------------------------------------------------------
-   Cenas 03 a 11 e o fechamento. As três primeiras usam a mesma
-   composição da mesa de montagem, nas mesmas coordenadas: a
-   dissolvência entre elas parece um plano só.
+   Cenas 03 a 11 e o fechamento.
 
    O filme é de venda, não de manual: a mesa passa rápido, e o
    tempo que sobra vai para a prévia grátis, o preço e o risco.
+   A cor, os modelos e o estudo aparecem como galeria em movimento
+   (as peças correm por uma espiral e se reorganizam em grade, anel
+   ou linha), e as letras de destaque são táteis: massinha, pasta,
+   papel-alumínio e uma bolha de plástico no cartaz final.
 ----------------------------------------------------------------*/
 (() => {
   const S = SCENES, put = S.put, pt = S.pt, F = FX;
@@ -31,59 +33,87 @@
     }
   }));
 
-  /* ---------- 04 · cor e letra ---------- */
-  S.list.push(S.mesaScene({
-    id: 'cor', num: '04', label: 'Cor e letra', dur: 7.5,
-    caption: 'A cor sai de uma carta de tendências; a letra muda o tom da loja sem mudar uma palavra.',
-    focos: [{ t: -9, f: 'cor' }, { t: 4.3, f: 'letra' }],
-    evs: [
-      { t: 1.0, ctrl: 'grupo', i: 1 }, { t: 1.8, ctrl: 'cor', i: 1 },
-      { t: 2.8, ctrl: 'grupo', i: 2 }, { t: 3.6, ctrl: 'cor', i: 3 },
-      { t: 4.9, ctrl: 'letra', i: 1 }, { t: 5.9, ctrl: 'letra', i: 3 }, { t: 6.9, ctrl: 'letra', i: 0 }
-    ]
-  }));
+  /* ---------- 04 · a cor da marca, em galeria ---------- */
+  S.list.push({
+    id: 'cor', num: '04', label: 'A cor da marca', dur: 10.0,
+    caption: 'Dezesseis tons em quatro famílias, todos tirados de um estudo de tendências. Você escolhe um e a vitrine inteira muda junto.',
+    build(s) {
+      const cores = [].concat(...DATA.grupos.map(g => g.cores.map(c => ({ ...c, grupo: g.grupo }))));
+      const itens = S.fotosDeCor(cores, 250, 300, 5);
+      itens.forEach((it, i) => {
+        it.arq = `${S.slug(it.cor.grupo)}/${it.arq}`;
+        if (i % 4 === 0) it.num = `${i + 1}  ·  ${it.cor.grupo}`;
+      });
+      const grade = { cols: 8, w: 250, h: 300, gx: 40, gy: 120, z: 520, y: 30 };
+      s._g = Galeria.cria(s, itens, {
+        etapas: [
+          { arranjo: 'linha', op: { x: 2900, passo: 30, z: 200 } },
+          { t: .15, arranjo: 'espiral', op: { raio: 400, largura: 1750, passo: .5, vel: .28, sobe: 170, z: 160 }, passo: .06, dur: 1.3 },
+          { t: 4.5, arranjo: 'grade', op: grade, passo: .045, dur: 1.2 },
+          { t: 7.0, arranjo: 'destaque', op: { i: 0, x: -470, y: 10, z: -330, resto: 'grade', restoOp: grade, recua: 1100 }, passo: 0, dur: 1.1 }
+        ],
+        camera: t => ({ x: Math.sin(t * .35) * 50 * (1 - F.smooth(F.span(t, 4.2, 5.4))), y: 60 * (1 - F.smooth(F.span(t, 4.2, 5.4))), z: 0, giro: -.05 * (1 - F.smooth(F.span(t, 4.2, 5.6))) }),
+        foco: t => t < 4.4 ? F.lerp(-150, 240, F.smooth(F.span(t, .8, 4.2))) : (t < 7 ? 520 : -330),
+        dof: .013,
+        linha: t => .9 * F.smooth(F.span(t, .9, 1.8)) * (1 - F.smooth(F.span(t, 4.3, 5.0))),
+        fios: t => .65 * F.smooth(F.span(t, 1.6, 2.6)) * (1 - F.smooth(F.span(t, 4.3, 4.9))), fiosDe: [8, 9, 10, 11, 12, 13, 14],
+        ancora: t => [1330 + Math.sin(t) * 20, 1010],
+        rotulos: t => 1 - F.smooth(F.span(t, 7.0, 7.6)) * .85,
+        /* quando o tom é escolhido, os outros recuam e quase somem */
+        entrada: (i, t) => i === 0 ? 1 : 1 - .82 * F.smooth(F.span(t, 7.0, 7.9)),
+        soltos: [{ x: -700, y: -380, z: 100, tam: 34, cor: '#e04a6b' }, { x: 940, y: -60, z: 500, tam: 48, cor: '#1e2a8a' }]
+      });
+      /* o tom escolhido ganha o nome em massinha, na cor dele */
+      const esc = cores[0];
+      s._nome = S.letrasQueCaem(s, esc.nome, { material: 'argila', cor: esc.hex, tam: 132, fonte: 'massa', x: 900, y: 350 });
+      s._hx = put(s, 'div', 'kicker ficha-k', `${esc.hex.slice(1)} · ${esc.grupo} · carta outono-inverno 26/27`);
+      Object.assign(s._hx.style, { left: '912px', top: '560px', position: 'absolute' });
+      s._fr = put(s, 'div', 'ficha-t', 'Escolhida: a vitrine inteira veste esta cor, dos botões ao fundo das peças.');
+      Object.assign(s._fr.style, { left: '912px', top: '604px' });
+    },
+    update(s, t) {
+      s._g.pose(t);
+      S.cai(s._nome, t, 7.5, .05);
+      S.fade(s._hx, F.span(t, 8.2, 8.8));
+      S.rise([s._fr], t, 8.5, 0, .8, 12);
+    }
+  });
 
-  /* ---------- 05 · vitrine e seções ---------- */
+  /* ---------- 05 · letra e vitrine ---------- */
   const evsHome = [
-    { t: 4.2, ctrl: 'home', id: 'sobre', v: 1 },
-    { t: 5.0, ctrl: 'home', id: 'clientes', v: 1 },
-    { t: 5.8, ctrl: 'home', id: 'whats', v: 1 },
-    { t: 6.6, ctrl: 'home', id: 'endereco', v: 1 }
+    { t: 6.1, ctrl: 'home', id: 'sobre', v: 1 },
+    { t: 6.8, ctrl: 'home', id: 'clientes', v: 1 },
+    { t: 7.5, ctrl: 'home', id: 'whats', v: 1 }
   ];
   S.list.push(S.mesaScene({
-    id: 'vitrine', num: '05', label: 'Vitrine e seções', dur: 8.0,
-    caption: 'Mais respiro ou vitrine cheia — e só os blocos que a sua loja usa entram na página.',
-    start: { ...S.ST0, gi: 2, ci: 3 },
-    focos: [{ t: -9, f: 'espaco' }, { t: 3.6, f: 'home' }],
+    id: 'letra', num: '05', label: 'Letra e vitrine', dur: 8.5,
+    caption: 'A letra muda o tom da loja sem mudar uma palavra. A vitrine respira ou enche, e só entra o bloco que você usa.',
+    focos: [{ t: -9, f: 'letra' }, { t: 3.3, f: 'espaco' }, { t: 5.6, f: 'home' }],
     evs: [
-      { t: 1.0, ctrl: 'espaco', i: 0 }, { t: 2.0, ctrl: 'espaco', i: 2 }, { t: 3.0, ctrl: 'espaco', i: 1 },
+      { t: 1.0, ctrl: 'letra', i: 1 }, { t: 1.9, ctrl: 'letra', i: 3 }, { t: 2.8, ctrl: 'letra', i: 0 },
+      { t: 3.8, ctrl: 'espaco', i: 0 }, { t: 4.6, ctrl: 'espaco', i: 2 }, { t: 5.4, ctrl: 'espaco', i: 1 },
       ...evsHome
     ],
     scroll(m, st, t) {
-      /* a prévia desliza até a seção que acabou de entrar */
       const i = evsHome.filter(e => e.t <= t).length - 1;
       if (i < 0) return 0;
       const ant = i > 0 ? S.scrollPara(m, st, evsHome[i - 1].id) : 0;
-      return F.lerp(ant, S.scrollPara(m, st, evsHome[i].id), F.smooth(F.span(t, evsHome[i].t, evsHome[i].t + .75)));
+      return F.lerp(ant, S.scrollPara(m, st, evsHome[i].id), F.smooth(F.span(t, evsHome[i].t, evsHome[i].t + .7)));
     }
   }));
 
-  /* ---------- 06 · doze modelos prontos ---------- */
+  /* ---------- 06 · doze modelos prontos, em anel ---------- */
   S.list.push({
-    id: 'modelos', num: '06', label: 'Doze modelos prontos', dur: 7.5,
+    id: 'modelos', num: '06', label: 'Doze modelos prontos', dur: 8.0,
     caption: 'Doze pontos de partida, um por tipo de loja. Escolha o seu e ajuste a partir dele.',
     build(s) {
-      const g = put(s, 'div', 'thumbs seis');
-      Object.assign(g.style, { left: '110px', top: '236px', width: '1700px' });
-      s._th = DATA.modelos.map(mo => {
-        const t = put(g, 'div', 'thumb');
+      const itens = DATA.modelos.map((mo, i) => {
+        const el = document.createElement('div'); el.className = 'thumb';
         const L = DATA.letras[mo.letra];
         const escuro = UI.lum(mo.fundo) < .35;
-        /* cor muito escura sobre fundo escuro some: o croqui clareia um pouco */
         const tinta = escuro && UI.lum(mo.cor) < .08 ? UI.mix(mo.cor, '#ffffff', .32) : mo.cor;
-        const w = put(t, 'div', 'win');
-        w.style.background = mo.fundo;
-        w.style.color = escuro ? '#f4f1ea' : '#171614';
+        const w = put(el, 'div', 'win');
+        Object.assign(w.style, { background: mo.fundo, color: escuro ? '#f4f1ea' : '#171614', height: '220px' });
         const br = put(w, 'div', 'w-br', 'sua marca');
         br.style.font = `${L.it} ${L.peso} ${Math.round(16 * L.esc)}px ${L.fam}`;
         br.style.letterSpacing = L.ls;
@@ -94,38 +124,29 @@
           d.innerHTML = Draw.croqui(k, tinta);
         });
         const l1 = put(w, 'div', 'w-l'); l1.style.background = tinta; l1.style.width = '58%';
-        const l2 = put(w, 'div', 'w-l'); l2.style.background = tinta; l2.style.width = '34%';
-        l2.style.marginTop = '8px';
-        put(t, 'div', 'nm', mo.nome);
-        put(t, 'div', 'tp', 'modelo pronto');
-        t._sel = put(t, 'div', 'sel');
-        return t;
+        const l2 = put(w, 'div', 'w-l'); l2.style.background = tinta; l2.style.width = '34%'; l2.style.marginTop = '8px';
+        el._sel = put(el, 'div', 'sel');
+        return { el, w: 300, h: 220, arq: `${String(i + 1).padStart(2, '0')}_${S.slug(mo.nome)}.html` };
       });
-      s._cur = UI.cursor(s);
+      s._itens = itens;
+      s._g = Galeria.cria(s, itens, {
+        etapas: [
+          { arranjo: 'anel', op: { raio: 660, vel: .42, incl: 70, y: -10, fase: 1.2, z: 420 } },
+          { t: 3.4, arranjo: 'grade', op: { cols: 6, w: 300, h: 220, gx: 34, gy: 96, z: 380, y: -20 }, passo: .05, dur: 1.2 }
+        ],
+        camera: () => ({ x: 0, y: 0, z: 0, giro: 0 }),
+        foco: t => F.lerp(-80, 380, F.smooth(F.span(t, 3.4, 4.8))), dof: .008,
+        linha: t => .8 * F.smooth(F.span(t, .3, 1.2)) * (1 - F.smooth(F.span(t, 3.3, 4.0))),
+        entrada: (i, t) => F.smooth(F.span(t, i * .05, .5 + i * .05))
+      });
       s._nota = put(s, 'div', 'kicker', 'Escolhido — a mesa já abre montada assim');
       Object.assign(s._nota.style, { position: 'absolute', left: '110px', top: '846px', opacity: 0 });
     },
     update(s, t) {
-      const passeio = [3, 5, 8, 0];
-      const pts = passeio.map((idx, i) => {
-        const q = pt(s._th[idx]);
-        return { t: 2.2 + i * .8, x: q.x + 36, y: q.y - 10 };
-      });
-      s._cur.show(F.clamp(F.span(t, 1.8, 2.2)));
-      s._cur.path(t, pts);
-      const tc = 2.2 + 3 * .8 + .2;
-      const alvo = pt(s._th[0]);
-      s._cur.click(t, tc, alvo.x + 36, alvo.y - 10, 16);
-      /* entrada em cascata e destaque do escolhido no mesmo transform */
-      s._th.forEach((n, i) => {
-        const a = .2 + i * .07;
-        const sobe = F.outQuint(F.span(t, a, a + .9));
-        n.style.opacity = sobe;
-        const on = (i === 0 && t >= tc);
-        n._sel.style.opacity = on ? F.out(F.span(t, tc, tc + .4)) : 0;
-        const k = on ? F.out(F.span(t, tc, tc + .5)) : 0;
-        n.style.transform = `translateY(${(1 - sobe) * 26}px) scale(${1 + k * .02})`;
-      });
+      s._g.pose(t);
+      /* o primeiro modelo é escolhido: anel em volta e um respiro de escala */
+      const tc = 5.6, k = F.out(F.span(t, tc, tc + .5));
+      s._itens[0].el._sel.style.opacity = k;
       S.fade(s._nota, F.span(t, tc + .3, tc + 1.1));
     }
   });
@@ -141,10 +162,11 @@
       put(b, 'div', 'h', 'O que você manda');
       s._ln = DATA.briefing.map(() => put(b, 'div', 'ln', ''));
       const fo = put(b, 'div', 'fotos');
-      s._ft = DATA.previa.fotos.map(k => {
+      s._ft = DATA.previa.fotos.map((k, i) => {
         const f = put(fo, 'div', 'ft');
         f.style.background = UI.mix('#faf7f1', cor, .14);
         f.innerHTML = Draw.croqui(k, cor);
+        put(f, 'div', 'fn', `${i + 1}`);
         return f;
       });
       s._fl = put(b, 'div', 'flg', 'cinco fotos de peças, do celular mesmo');
@@ -208,44 +230,38 @@
 
   /* ---------- 08 · cor com estudo ---------- */
   S.list.push({
-    id: 'carta', num: '08', label: 'Cor com estudo', dur: 8.0,
-    caption: 'Cada tom da mesa sai de um estudo de tendências: marcas lidas no código, não no achismo.',
+    id: 'carta', num: '08', label: 'Cor com estudo', dur: 8.5,
+    caption: 'Vinte e oito marcas lidas no código e cento e nove cores medidas: é daí que sai a carta de quinze tons da mesa.',
     build(s) {
-      const n = put(s, 'div', 'nums pq');
-      Object.assign(n.style, { left: '0', top: '196px' });
-      s._n = DATA.numeros.map(x => {
-        const d = put(n, 'div', 'num');
-        const v = put(d, 'div', 'n', '0');
-        put(d, 'div', 't', x.t);
-        return { v, alvo: parseInt(x.n, 10), el: d };
+      /* os números do estudo em papel-alumínio amassado */
+      s._n = DATA.numeros.map((x, i) => {
+        const cx = 330 + i * 420;
+        const box = S.letrasQueCaem(s, x.n, { material: 'folha', tam: 150, fonte: 'cartaz', x: 0, y: 150, semente: 13 + i * 5 });
+        box.style.left = (cx - box._larg / 2) + 'px';
+        const lb = put(s, 'div', 'kicker num-k', x.t);
+        Object.assign(lb.style, { left: (cx - 160) + 'px', top: '378px' });
+        return { box, lb };
       });
-      const tons = put(s, 'div', 'tons');
-      Object.assign(tons.style, { left: '205px', top: '470px' });
-      const nomeados = [].concat(...DATA.grupos.map(g => g.cores))
-        .filter(c => ['Muted Clay', 'Terracota', 'Red Mahogany', 'Bordô', 'Marinho', 'Púrpura',
-                      'Acacia', 'Chartreuse', 'Neptune Green'].includes(c.nome));
-      s._t = nomeados.map(c => {
-        const d = put(tons, 'div', 'ton');
-        const sw = put(d, 'div', 'sw'); sw.style.background = c.hex; sw.style.height = '178px';
-        put(d, 'div', 'nm', c.nome);
-        put(d, 'div', 'hx', c.hex);
-        return d;
+      const cores = [].concat(...DATA.grupos.map(g => g.cores)).slice(0, 15);
+      const itens = S.fotosDeCor(cores, 190, 230, 61);
+      s._g = Galeria.cria(s, itens, {
+        etapas: [
+          { arranjo: 'espiral', op: { raio: 260, largura: 1650, passo: .58, vel: .4, sobe: 150, z: 120 } },
+          { t: 4.7, arranjo: 'linha', op: { passo: 210, z: 330, y: 0 }, passo: .05, dur: 1.2 }
+        ],
+        camera: t => ({ x: Math.sin(t * .3) * 30, y: -120, z: 0, giro: -.04 }),
+        foco: t => t < 4.6 ? F.lerp(-120, 200, F.smooth(F.span(t, .5, 4.5))) : 330, dof: .014,
+        linha: t => .85 * F.smooth(F.span(t, .4, 1.4)),
+        entrada: (i, t) => F.smooth(F.span(t, i * .04, .4 + i * .04)),
+        soltos: [{ x: 880, y: 380, z: 0, tam: 30, cor: '#e3c14e' }]
       });
-      s._leg = put(s, 'div', 'kicker', 'Carta Outono-Inverno 26/27 · 15 tons, 9 já batizados');
-      Object.assign(s._leg.style, { position: 'absolute', left: '205px', top: '428px', opacity: 0 });
-      s._elo = put(s, 'div', 'elo', 'os mesmos tons que aparecem lá na Cor da marca');
-      Object.assign(s._elo.style, { left: '205px', top: '806px', opacity: 0 });
     },
     update(s, t) {
+      s._g.pose(t);
       s._n.forEach((x, i) => {
-        const a = .2 + i * .18;
-        const k = F.outQuint(F.span(t, a, a + 1.3));
-        x.el.style.opacity = F.clamp(k * 2);
-        x.v.textContent = Math.round(k * x.alvo);
+        S.cai(x.box, t, .4 + i * .35, .08, 110);
+        S.fade(x.lb, F.span(t, 1.0 + i * .35, 1.5 + i * .35));
       });
-      S.fade(s._leg, F.span(t, 1.4, 2.1));
-      S.rise(s._t, t, 1.6, .09, .9, 28);
-      S.fade(s._elo, F.span(t, 4.2, 5.0));
     }
   });
 
@@ -320,7 +336,11 @@
       Object.assign(B.style, { left: '1210px', top: '742px', width: '600px' });
       const l1 = put(B, 'div', 'cl');
       put(l1, 'span', null, 'Economia achada no mês');
-      s._eco = put(l1, 'b', null, 'R$ 0');
+      const eco = Tatil.texto(reais(C.mes.economia), { material: 'pasta', cor: '#b9d23a', tam: 62, fonte: 'cartaz', sombraCor: '#000000', semente: 77 });
+      eco.className = 'eco';
+      eco.style.margin = `${-eco._pad}px ${-eco._pad}px ${-eco._pad}px 0`;
+      l1.appendChild(eco);
+      s._eco = eco;
       const l2 = put(B, 'div', 'cl');
       put(l2, 'span', null, 'O radar custa');
       put(l2, 'b', 'custo', reais(C.mes.radar) + '/mês');
@@ -329,7 +349,6 @@
       s._B = B;
     },
     update(s, t) {
-      const C = DATA.compras;
       const kp = F.outQuint(F.span(t, .15, 1.4));
       s._p.style.opacity = kp;
       s._p.style.transform = `translateY(${(1 - kp) * 24}px)`;
@@ -377,8 +396,9 @@
       const kb = F.outQuint(F.span(t, 7.6, 8.6));
       s._B.style.opacity = kb;
       s._B.style.transform = `translateY(${(1 - kb) * 18}px)`;
-      const ke = F.ease(F.span(t, 8.0, 9.3));
-      s._eco.textContent = reais(Math.round(ke * C.mes.economia / 5) * 5);
+      /* a pasta sai da bisnaga da esquerda para a direita */
+      const ke = F.ease(F.span(t, 8.0, 9.3)), pad = s._eco._pad, lw = s._eco._lw;
+      s._eco.style.clipPath = `inset(0 ${(s._eco.width - pad - lw * ke).toFixed(1)}px 0 0)`;
       S.fade(s._sob, F.span(t, 9.4, 10.0));
     }
   });
@@ -432,8 +452,11 @@
     build(s) {
       s._c = DATA.semRisco.map((d, i) => {
         const c = put(s, 'div', 'step');
-        Object.assign(c.style, { left: (110 + i * 580) + 'px', top: '370px' });
-        put(c, 'div', 'n', d.n);
+        Object.assign(c.style, { left: (110 + i * 580) + 'px', top: '300px' });
+        const n = Tatil.texto(d.n, { material: 'folha', tam: 120, fonte: 'cartaz', semente: 31 + i * 9 });
+        n.className = 'step-n';
+        n.style.margin = `${-n._pad}px 0 ${-n._pad - 4}px ${-n._pad}px`;
+        c.appendChild(n);
         const bar = put(c, 'div', 'bar');
         bar.style.marginTop = '20px';
         put(c, 'div', 't', d.t);
@@ -453,32 +476,49 @@
     }
   });
 
-  /* ---------- fechamento ---------- */
+  /* ---------- fechamento: o cartaz ---------- */
   S.list.push({
-    id: 'fecho', dur: 7.0, label: null, caption: null,
+    id: 'fecho', dur: 7.5, label: null, caption: null,
     build(s) {
-      const c = put(s, 'div', 'center'); c.style.top = '300px';
-      s._k = put(c, 'div', 'kicker', 'Comece pela prévia grátis');
-      s._t = put(c, 'div', 'display');
-      Object.assign(s._t.style, { fontSize: '96px', marginTop: '40px', letterSpacing: '-.025em' });
-      s._t.innerHTML = 'Me manda cinco peças.<br><em>Eu devolvo a sua vitrine.</em>';
-      s._b = put(c, 'div');
-      s._b.style.marginTop = '62px';
-      s._b.innerHTML = `<span class="cta">${Draw.whats('#171614', 20)}Prévia grátis · ${DATA.previa.prazo}</span>`;
-      s._s = put(c, 'div');
-      Object.assign(s._s.style, {
-        font: "400 15px/1 'PlexMono',monospace", letterSpacing: '.24em', textTransform: 'uppercase',
-        color: 'rgba(23,22,20,.42)', marginTop: '38px'
-      });
-      s._s.textContent = 'responda esta mensagem com as fotos';
+      s.classList.add('cena-cartaz');
+      const tipo = put(s, 'div', 'cartaz-fecho', 'Me manda<br>cinco<br>peças.');
+      /* a lente: a mesma tipografia, ampliada, só dentro da bolha */
+      const lente = put(s, 'div', 'lente');
+      const tipo2 = tipo.cloneNode(true); lente.appendChild(tipo2);
+      const bw = 660, bh = 560;
+      const pts = Tatil.contorno(bw / 2, bh / 2, 236, 23, 80, .34);
+      const bolha = Tatil.forma(bw, bh, g => { Tatil.tracaContorno(g, pts); g.fill(); },
+        { material: 'vidro', cor: '#ffffff', tam: 320, sombraCor: '#5a1a0e', semente: 23 });
+      bolha.className = 'bolha';
+      s.appendChild(bolha);
+      s._t = tipo; s._t2 = tipo2; s._lente = lente; s._bolha = bolha; s._pts = pts; s._bw = bw; s._bh = bh;
+
+      s._dev = S.letrasQueCaem(s, 'Eu devolvo', { material: 'argila', cor: '#f3e7d3', tam: 104, fonte: 'massa', x: 1110, y: 560, sombraCor: '#5a1a0e', semente: 51 });
+      s._sua = S.letrasQueCaem(s, 'a sua vitrine.', { material: 'argila', cor: '#f3e7d3', tam: 104, fonte: 'massa', x: 1110, y: 680, sombraCor: '#5a1a0e', semente: 57 });
+      s._cta = put(s, 'div', 'cartaz-cta', `${Draw.whats('#171614', 22)}<span>Prévia grátis · ${DATA.previa.prazo}</span>`);
+      s._miu = [
+        put(s, 'div', 'miudo m1', 'Ateliê Digital<br>vitrines para boutiques'),
+        put(s, 'div', 'miudo m2', 'responda esta mensagem<br>com cinco fotos de peças'),
+        put(s, 'div', 'miudo m3', 'prévia / 001')
+      ];
     },
     update(s, t) {
-      S.fade(s._k, F.outQuint(F.span(t, .2, 1.3)));
-      const k = F.outQuint(F.span(t, .5, 2.1));
-      s._t.style.opacity = k; s._t.style.transform = `translateY(${(1 - k) * 24}px)`;
-      const kb = F.outQuint(F.span(t, 2.0, 3.2));
-      s._b.style.opacity = kb; s._b.style.transform = `translateY(${(1 - kb) * 18}px)`;
-      S.fade(s._s, F.span(t, 3.0, 4.0));
+      const k = F.outQuint(F.span(t, .1, 1.2));
+      s._t.style.opacity = k; s._t.style.transform = `translateY(${(1 - k) * 30}px)`;
+      s._lente.style.opacity = k;
+      /* a bolha passeia devagar por cima das palavras */
+      const bx = 120 + Math.sin(t * .5 + .3) * 190 + t * 34, by = 170 + Math.cos(t * .4) * 140;
+      const kb = F.outQuint(F.span(t, .5, 1.6));
+      s._bolha.style.opacity = kb;
+      s._bolha.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px) scale(${(.9 + .1 * kb).toFixed(3)})`;
+      const cx = bx + s._bw / 2, cy = by + s._bh / 2;
+      s._lente.style.clipPath = `polygon(${s._pts.map(p => `${(p[0] + bx).toFixed(1)}px ${(p[1] + by).toFixed(1)}px`).join(',')})`;
+      s._t2.style.transformOrigin = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
+      s._t2.style.transform = `translate(${((1 - k) * 0).toFixed(1)}px,${((1 - k) * 30).toFixed(1)}px) scale(1.14)`;
+      S.cai(s._dev, t, 1.4, .05, 90);
+      S.cai(s._sua, t, 1.9, .05, 90);
+      S.rise([s._cta], t, 2.8, 0, .9, 16);
+      S.rise(s._miu, t, 3.2, .2, .8, 8);
     }
   });
 })();
