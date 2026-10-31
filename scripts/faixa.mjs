@@ -10,7 +10,8 @@
    - corte vertical (43,5 s): começa aos 32,5 s, onde a música abre,
      para o gancho já ter batida, e sai em 2,5 s no fim.
 
-   As duas saem em -16 LUFS, o nível de vídeo de rede social.
+   As duas saem em -19 LUFS: 3 dB abaixo do teto de rede social, para a
+   música acompanhar o filme sem empurrar o texto.
    uso: node scripts/faixa.mjs
         node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha-jazz.wav
         node scripts/mux.mjs atelie-digital-vertical.mp4 trilha-jazz-vertical.wav
@@ -22,7 +23,7 @@ import { fileURLToPath } from 'url';
 
 const raiz = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MUSICA = path.join(raiz, 'audio', 'vitrine-jazz-house.mp3');
-const ALVO = -16;
+const ALVO = -19;
 
 /* batidas medidas na própria faixa: a primeira em 0,486 s, uma a cada 0,5002 s */
 const batida = k => 0.486 + k * (60 / 119.95);

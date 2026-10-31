@@ -60,12 +60,14 @@ npm run vertical                                # o corte vertical, ~4 min
 node scripts/faixa.mjs                          # out/trilha-jazz.wav e trilha-jazz-vertical.wav
 node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha-jazz.wav
 node scripts/mux.mjs atelie-digital-vertical.mp4 trilha-jazz-vertical.wav
+
+node scripts/insta.mjs                          # peças do Instagram em insta/, ~30 s
 ```
 
 A música tem 1 min 46 s a 120 bpm. No filme principal, `faixa.mjs` pula os 3 s
 de entrada e repete quatro compassos do meio, com os cortes em cima da batida,
 e o fim da música cai no fim do filme. No vertical, ela começa aos 32,5 s, onde
-a música abre, e sai em 2,5 s. As duas ficam em −16 LUFS. Para voltar à trilha
+a música abre, e sai em 2,5 s. As duas ficam em −19 LUFS. Para voltar à trilha
 sintetizada: `node scripts/music.mjs 111` e `node scripts/mux.mjs
 atelie-digital-como-funciona.mp4 trilha.wav` (e `music.mjs 43.5
 trilha-vertical.wav` para o vertical).
@@ -144,6 +146,7 @@ aplicativo cobre com o nome do perfil, a legenda e os botões.
 | as cenas do corte vertical | `src/js/vertical.js`, `src/css/vertical.css` |
 | duração, dissolvência, rótulos e legendas | `src/js/timeline.js` |
 | onde a música é cortada em cada filme | `scripts/faixa.mjs` |
+| foto de perfil, destaques e posts do Instagram | `src/js/insta.js`, `src/css/insta.css`; textos em `docs/instagram.md` |
 | harmonia, melodia e mistura da trilha sintetizada | `scripts/music.mjs` |
 
 Mudou a duração de alguma cena? Nada mais precisa ser ajustado: a linha do tempo
@@ -170,9 +173,9 @@ soma as durações sozinha. A música, essa sim, precisa de outro corte em
   vezes a mensalidade. A linha de preço usa a faixa da própria série, com piso
   de 14 % — preço parado desenha linha reta, e não serra.
 - **A música entra inteira, sem mudar andamento nem tom.** Para caber nos
-  filmes, ela só é cortada e emendada em cima da batida. Fica em −16 LUFS, mais
-  alta que a trilha sintetizada de antes (perto de −22), porque agora é a
-  música que segura o filme sem narração.
+  filmes, ela só é cortada e emendada em cima da batida. Fica em −19 LUFS:
+  presente, porque é ela que segura o filme sem narração, mas 3 dB abaixo do
+  teto de rede social, para não competir com a leitura do texto.
 
 ## Créditos técnicos
 
