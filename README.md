@@ -147,6 +147,7 @@ aplicativo cobre com o nome do perfil, a legenda e os botões.
 | duração, dissolvência, rótulos e legendas | `src/js/timeline.js` |
 | onde a música é cortada em cada filme | `scripts/faixa.mjs` |
 | foto de perfil, destaques e posts do Instagram | `src/js/insta.js`, `src/css/insta.css`; textos em `docs/instagram.md` |
+| quem procurar, o que dizer e o que a rotina diária faz | `docs/prospeccao.md` |
 | harmonia, melodia e mistura da trilha sintetizada | `scripts/music.mjs` |
 
 Mudou a duração de alguma cena? Nada mais precisa ser ajustado: a linha do tempo
