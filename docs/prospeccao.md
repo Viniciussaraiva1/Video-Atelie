@@ -28,9 +28,12 @@ Fora: redes grandes, só atacado, só moda masculina, quem já tem loja online c
    **depois que você aprova a ficha** (ou sem aprovação, se você trocar o modo nos Ajustes).
    Aprovar a ficha vale para a primeira mensagem e até dois retornos; qualquer resposta ou
    pedido para parar encerra a sequência. Todo e-mail tem uma linha para a pessoa pedir para não receber mais.
-3. **Projetos (Workana, 99Freelas).** Os sites bloqueiam leitura automática. Ative nos dois os
-   alertas por e-mail de projetos de "loja virtual", "site" e "catálogo" de moda: a rotina lê os
-   alertas no Gmail, cria a ficha e escreve a proposta, que você envia pela plataforma.
+3. **Projetos (99Freelas, Workana).** A busca pública da 99Freelas pode ser lida: a rotina abre as buscas
+   de moda, loja de roupas, boutique, reels, identidade visual e loja virtual, confere se o projeto
+   ainda aceita proposta e escreve a proposta, que você envia pela plataforma (anexe o Reel curto
+   como portfólio). Preço de serviço fora da tabela vem marcado "preço sugerido, confirme".
+   A Workana bloqueia a leitura: ative lá os alertas por e-mail de "loja virtual", "site" e "catálogo"
+   de moda, que a rotina lê no Gmail.
 4. **Quem chega sozinho.** Comentário "VITRINE" ou "PRÉVIA" nos posts → resposta automática no direct
    com o link da prévia. Isso a Meta permite, porque a pessoa falou primeiro. Configure uma vez no
    ManyChat (parceiro oficial da Meta, plano grátis): gatilho "comentário com palavra-chave", palavras
