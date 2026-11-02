@@ -1,0 +1,39 @@
+/* ---------------------------------------------------------------
+   O filme principal em 9:16, para Reels.
+   O filme entra inteiro numa janela de 1080 × 607,5 px (escala
+   0,5625) e o que era pequeno demais para o celular — rótulo da
+   cena e legenda — sai do filme e vira texto grande em volta dele.
+   Tudo que importa fica entre 240 e 1480 px de altura: acima, o
+   Instagram põe o cabeçalho; abaixo, nome, legenda e botões. Na
+   grade do perfil (recorte 3:4, de 240 a 1680 px) a janela e o
+   título aparecem inteiros.
+----------------------------------------------------------------*/
+:root{--RW:1080px;--RH:1920px;}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--paper);}
+
+#reels{position:relative;width:1080px;height:1920px;background:var(--paper);overflow:hidden;}
+
+#janela{position:absolute;left:0;top:640px;width:1080px;height:607.5px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(23,22,20,.10),0 -1px 0 rgba(23,22,20,.10);}
+#janela #stage{transform:scale(.5625);transform-origin:0 0;}
+/* rótulo, legenda, assinatura e folio saem do filme: vão para fora, em tamanho de celular */
+#janela #label,#janela #caption,#janela #mark,#janela #folio,#janela #progress,#janela #grao{display:none;}
+
+#r-marca{position:absolute;top:262px;left:0;width:100%;text-align:center;text-indent:.42em;
+  font:400 22px/1 'PlexMono',monospace;letter-spacing:.42em;color:var(--ink-42);}
+
+#r-topo{position:absolute;left:70px;width:940px;bottom:calc(1920px - 600px);text-align:center;}
+#r-num{font:500 24px/1 'PlexMono',monospace;letter-spacing:.3em;color:var(--ink-42);margin-bottom:26px;text-indent:.3em;}
+#r-tit{font:400 112px/.98 'Anton','Inter',sans-serif;text-transform:uppercase;color:var(--ink);letter-spacing:.004em;}
+#r-tit em{font:italic 400 88px/1.05 'Playfair',serif;text-transform:none;letter-spacing:-.01em;display:block;}
+
+/* capítulos: um traço por cena numerada, o atual preenchendo */
+#r-capitulos{position:absolute;left:70px;width:940px;top:1290px;height:6px;display:flex;gap:8px;}
+#r-capitulos b{flex:1;height:100%;border-radius:3px;background:rgba(23,22,20,.10);overflow:hidden;}
+#r-capitulos b i{display:block;height:100%;width:0;background:var(--ink);}
+
+#r-leg{position:absolute;left:70px;width:940px;top:1336px;text-align:center;
+  font:400 37px/1.36 'Inter',sans-serif;color:var(--ink-60);text-wrap:balance;}
+#r-leg strong{color:var(--ink);font-weight:600;}
+
+#r-grao{position:absolute;inset:0;pointer-events:none;background-size:512px 512px;opacity:.9;}

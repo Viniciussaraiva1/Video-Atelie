@@ -8,7 +8,10 @@ pelo Instagram:
   o estudo de tendências por trás das cores, o radar de compra, o preço em dois
   passos e o que tira o risco da lojista;
 - **o corte vertical** (1080×1920, 30 qps, 43,5 s) — o mesmo argumento em seis
-  frases grandes, para Reels, Stories e Status do WhatsApp.
+  frases grandes, para Reels, Stories e Status do WhatsApp;
+- **os Reels** (`reels/`, 1080×1920) — o corte vertical e o filme inteiro em 9:16,
+  os dois com a música "Lampejo", prontos para postar. Como postar e as legendas
+  estão em [`docs/instagram.md`](docs/instagram.md#reels).
 
 ## O estilo: tátil, em galeria
 
@@ -43,7 +46,9 @@ Tudo é feito em JavaScript, sem banco de imagens:
   táteis e as fotos da galeria são iluminadas pixel a pixel em `src/js/tatil.js`);
 - **movimento** — uma linha do tempo determinística: `seek(t)` desenha o quadro
   exato do instante `t`, sem depender de relógio ou de `requestAnimationFrame`;
-- **som** — a música "Vitrine (jazz house)" (`audio/vitrine-jazz-house.mp3`),
+- **som** — nos Reels, "Lampejo", house psicodélico composto e sintetizado em
+  `scripts/lampejo.mjs`, com o arranjo preso aos cortes de cada filme; nos filmes
+  originais, a música "Vitrine (jazz house)" (`audio/vitrine-jazz-house.mp3`),
   encaixada na duração de cada filme por `scripts/faixa.mjs`. A trilha lo-fi
   sintetizada antiga (`scripts/music.mjs`) continua no repositório como
   alternativa;
@@ -62,7 +67,24 @@ node scripts/mux.mjs atelie-digital-como-funciona.mp4 trilha-jazz.wav
 node scripts/mux.mjs atelie-digital-vertical.mp4 trilha-jazz-vertical.wav
 
 node scripts/insta.mjs                          # peças do Instagram em insta/, ~30 s
+
+# Reels
+node scripts/render.mjs 30 atelie-reels-completo.mp4 reels.html   # filme inteiro em 9:16, ~30 min
+cp out/atelie-digital-vertical.mp4 out/atelie-reels-curto.mp4
+node scripts/lampejo.mjs                        # out/trilha-lampejo.wav e trilha-lampejo-vertical.wav, ~10 s
+node scripts/mux.mjs atelie-reels-completo.mp4 trilha-lampejo.wav
+node scripts/mux.mjs atelie-reels-curto.mp4 trilha-lampejo-vertical.wav
 ```
+
+"Lampejo" (120 bpm, Fá maior com o Si♭ menor emprestado no fim do ciclo) não usa
+amostra nenhuma: bumbo reto, palma, chimbal, baixo de disco em oitavas, acordes de
+serra com phaser, um arpejo de sininho e uma "voz" picotada feita de formantes de
+vogal, tudo respirando com o bumbo e passando por um filtro que abre e fecha a
+mistura inteira. O que muda de um filme para o outro é só o arranjo, em `PLANOS`:
+no completo, a abertura toca abafada e o filtro abre no corte da cena 01, fica a
+meia-luz na prévia e volta inteiro na cor com estudo; no curto, a batida já está
+no primeiro quadro, porque Reels não espera. Como toda música desta pasta, sai em
+−19 LUFS.
 
 A música tem 1 min 46 s a 120 bpm. No filme principal, `faixa.mjs` pula os 3 s
 de entrada e repete quatro compassos do meio, com os cortes em cima da batida,
@@ -90,7 +112,7 @@ PAGINA=vertical.html node scripts/shot.mjs 0 15 # quadros do corte vertical em o
 
 Ver no navegador: abra `src/index.html?play` (roda em laço) ou
 `src/index.html?t=43` (congela num instante). O corte vertical é
-`src/vertical.html`, com os mesmos parâmetros.
+`src/vertical.html` e o completo em 9:16 é `src/reels.html`, com os mesmos parâmetros.
 
 > O Chromium usado é o que vem instalado em `/opt/pw-browsers/chromium`. Em
 > outra máquina, aponte o caminho com
@@ -149,6 +171,8 @@ aplicativo cobre com o nome do perfil, a legenda e os botões.
 | foto de perfil, destaques e posts do Instagram | `src/js/insta.js`, `src/css/insta.css`; textos em `docs/instagram.md` |
 | quem procurar, o que dizer e o que a rotina diária faz | `docs/prospeccao.md` |
 | harmonia, melodia e mistura da trilha sintetizada | `scripts/music.mjs` |
+| música dos Reels: acordes, voz picotada, arranjo de cada filme | `scripts/lampejo.mjs` |
+| moldura do filme completo em 9:16 (título, legenda, capítulos) | `src/reels.html`, `src/js/reels.js`, `src/css/reels.css` |
 
 Mudou a duração de alguma cena? Nada mais precisa ser ajustado: a linha do tempo
 soma as durações sozinha. A música, essa sim, precisa de outro corte em

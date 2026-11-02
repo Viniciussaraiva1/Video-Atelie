@@ -148,6 +148,57 @@ Chama no WhatsApp pelo link da bio, ou comenta VITRINE aqui.
 #boutique #modafeminina #lojavirtual
 ```
 
+## Reels
+
+Os dois vídeos prontos para postar estão em `reels/`, os dois em 1080×1920 (9:16), 30 qps,
+H.264 e com a música "Lampejo" já dentro:
+
+| arquivo | dura | para quê |
+|---|---|---|
+| `reels/atelie-reels-curto.mp4` | 43,5 s | o Reel principal: o gancho já está no primeiro quadro e a batida também |
+| `reels/atelie-reels-completo.mp4` | 1 min 51 s | o filme inteiro para quem quer ver tudo; fixe no perfil depois do curto |
+| `reels/capa-curto.jpg`, `reels/capa-completo.jpg` | — | capas; o que importa fica no recorte 3:4 da grade do perfil |
+
+No completo, o filme 16:9 entra inteiro numa janela no meio da tela e o rótulo e a legenda
+de cada cena saem do filme e viram texto grande em volta, para dar para ler no celular.
+Nos dois, tudo que importa fica entre 240 e 1480 px de altura, longe do cabeçalho, da
+legenda e dos botões que o Instagram põe por cima.
+
+**Na hora de postar**
+
+1. Suba o arquivo da galeria do celular e não ponha música do Instagram por cima: a trilha
+   já está no vídeo. Em capa, escolha "Adicionar da galeria" e use a capa correspondente.
+2. Deixe "Mostrar na grade do perfil" ligado.
+3. Na primeira vez, o Instagram chama o som de "Áudio original". Toque nele e renomeie para
+   **Lampejo · Ateliê Digital**: quem usar o som nos próprios vídeos leva o nome do Ateliê junto.
+4. Música comercial (de qualquer artista) faz o Instagram silenciar o áudio ou limitar o
+   alcance de conta comercial. "Lampejo" é composição própria, gerada por
+   `scripts/lampejo.mjs`, então pode ser usada à vontade, inclusive em anúncio.
+
+### Legenda do Reel curto
+
+> Você não vende pouco. Você responde demais.
+>
+> Quanto custa? Tem no P? Faz entrega? Se a resposta já estivesse na página, a cliente
+> decidia sozinha e só chamava para fechar.
+>
+> O Ateliê Digital troca o link da bio por uma vitrine com a cara da sua loja. Prévia grátis
+> com cinco peças suas: comente VITRINE que eu te explico como mandar.
+>
+> #boutique #modafeminina #lojavirtual #vendasnoinstagram
+
+### Legenda do Reel completo
+
+> Como funciona, do link da bio ao preço, em menos de dois minutos.
+>
+> 01 o problema · 02 o link da bio · 03 a mesa de montagem · 04 a cor da marca ·
+> 05 letra e vitrine · 06 doze modelos · 07 prévia grátis · 08 cor com estudo ·
+> 09 radar de compra · 10 quanto custa · 11 sem risco
+>
+> Salve para ver com calma. Quer ver a sua loja assim? Comente VITRINE.
+>
+> #boutique #lojavirtual #empreendedorismofeminino #modafeminina
+
 ## Ritmo do primeiro mês
 
 | Semana | Segunda | Quarta | Sexta |
