@@ -28,7 +28,7 @@ estudo de Zara, Riachuelo e Farm Rio, feito em 3 de novembro de 2026.
 | A foto manda | Foto da peça em 2:3, sem moldura nem sombra; no celular, de ponta a ponta | Farm (2:3 medido); Zara |
 | Interface quieta | Fundo branco ou papel #FAF8F5, texto #2B2623, apoio #6B625C, linhas #E7E2DC. A cor fica na foto | Farm (#333 e #999); Zara |
 | Contraste que se lê | Texto de apoio nunca mais claro que #6B625C (5,9:1 no branco). O #999 da Farm dá 2,8:1 e não passa | crítica à Zara; medida na Farm |
-| Duas letras, papéis fixos | Bodoni Moda só nos títulos e Jost na interface. Corpo de 16 a 17 px, nome da peça em 14 px, nada abaixo de 12 px | Farm (17 e 14 px); crítica à Zara |
+| Uma letra limpa | Montserrat em tudo, títulos em peso 300; a serifa didone fica só no nome da loja. Corpo de 16 a 17 px, nome da peça em 14 px, nada abaixo de 12 px | Farm (Montserrat, 17 e 14 px, título 300); Zara e Riachuelo (sem serifa na interface, didone só na marca da Zara) |
 | Caixa alta com moderação | Só em rótulos de até três palavras, de 11 a 12 px, com espaçamento de 0,14em | Zara (o uso); Farm (a moderação) |
 | Grade densa | 2 colunas no celular com 4 px entre as fotos; 3 colunas a partir de 900 px e 4 a partir de 1280 px; botão para trocar a densidade | Farm; Zara (botão VER) |
 | Cartão enxuto | Foto, nome numa linha só (corta com reticências), preço inteiro e condição em cinza; um "+" escolhe o tamanho sem sair da grade | Zara (+); Farm |

@@ -19,9 +19,11 @@
   --sobre-botao:#FFFFFF;
   --marca:#2B2623;            /* loja: cor da marca; aparece no botão só quando a loja pede */
 
-  /* letra: duas famílias, papéis fixos */
-  --letra-titulo:'Bodoni Moda',Georgia,'Times New Roman',serif;   /* loja */
-  --letra:'Jost','Helvetica Neue',Arial,sans-serif;               /* loja */
+  /* letra: uma sem serifa limpa em tudo (Montserrat, a mesma da Farm, perto da grotesca
+     da Zara e da Riachuelo). Títulos em peso 300. A serifa didone fica só no nome da loja. */
+  --letra-titulo:'Montserrat','Helvetica Neue',Arial,sans-serif;  /* loja */
+  --letra:'Montserrat','Helvetica Neue',Arial,sans-serif;         /* loja */
+  --letra-marca:'Bodoni Moda',Georgia,'Times New Roman',serif;    /* loja: só no nome da loja */
   --corpo:16px;               /* corpo de 16 a 17 px */
   --peca:14px;                /* nome e preço da peça */
   --rotulo:11.5px;            /* rótulo em caixa alta, até três palavras */
@@ -57,7 +59,7 @@ img{max-width:100%;display:block}
 /* cabeçalho: menu à esquerda, marca no centro, sacola à direita */
 .topo{position:sticky;top:0;z-index:10;height:var(--topo);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
   gap:12px;padding:0 var(--margem);background:color-mix(in srgb,var(--papel) 94%,transparent);border-bottom:1px solid var(--linha)}
-.topo .marca{font-family:var(--letra-titulo);font-size:20px;letter-spacing:.06em;text-decoration:none;color:inherit;white-space:nowrap}
+.topo .marca{font-family:var(--letra-marca);font-size:20px;letter-spacing:.06em;text-decoration:none;color:inherit;white-space:nowrap}
 .topo .lado{display:flex;align-items:center;gap:20px}
 .topo .lado:last-child{justify-content:flex-end}
 
@@ -95,7 +97,7 @@ img{max-width:100%;display:block}
 .ficha .galeria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--vao-foto)}
 .ficha .galeria img{aspect-ratio:var(--foto);width:100%;object-fit:cover}
 .ficha .info{display:flex;flex-direction:column;gap:14px;padding:24px var(--margem) 0;min-width:0}
-.ficha h1{font-family:var(--letra-titulo);font-weight:400;font-size:26px;line-height:1.2;margin:0}
+.ficha h1{font-family:var(--letra-titulo);font-weight:300;font-size:26px;line-height:1.2;margin:0}
 .ficha .preco{font-size:18px;font-weight:600}
 .ficha .condicao{display:block;font-size:13px;font-weight:400;color:var(--apoio)}
 .tamanhos{display:flex;flex-wrap:wrap;gap:8px}
