@@ -202,6 +202,14 @@ soma as durações sozinha. A música, essa sim, precisa de outro corte em
   presente, porque é ela que segura o filme sem narração, mas 3 dB abaixo do
   teto de rede social, para não competir com a leitura do texto.
 
+## A página do Ateliê e a base das vitrines
+
+- `pagina/` guarda o código da página de venda do Ateliê Digital, com a mesa de
+  montagem, os pacotes e as dúvidas. É o mesmo arquivo publicado no Claude.
+- `base/` guarda a base de design de toda vitrine nova: as 12 regras tiradas do
+  estudo de Zara, Riachuelo e Farm Rio (`base/README.md`) e o CSS pronto
+  (`base/base-vitrine.css`).
+
 ## Créditos técnicos
 
 Fontes em `src/fonts/` (Playfair Display, IBM Plex Mono, Inter, Anton e Bagel
