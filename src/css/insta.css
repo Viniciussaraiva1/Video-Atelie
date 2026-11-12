@@ -1,0 +1,30 @@
+/* ---------------------------------------------------------------
+   Peças do Instagram: foto de perfil, capas de destaque e posts.
+   Usa as mesmas fontes, papel e matéria tátil do filme.
+----------------------------------------------------------------*/
+html,body{width:auto;height:auto;overflow:visible;background:#888;}
+#peca{position:relative;overflow:hidden;background:var(--paper);}
+#peca .ig-gr{position:absolute;inset:0;pointer-events:none;background-size:512px 512px;opacity:.9;z-index:50;}
+#peca canvas.t{position:absolute;display:block;}
+.ig-k{position:absolute;font:500 22px/1.3 'PlexMono',monospace;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-60);}
+.ig-an{position:absolute;font-family:'Anton','Inter',sans-serif;text-transform:uppercase;color:#151210;line-height:.92;
+  white-space:nowrap;letter-spacing:-.004em;}
+.ig-pf{position:absolute;font:italic 400 46px/1.25 'Playfair',serif;color:var(--ink-60);}
+.ig-tx{position:absolute;font:400 34px/1.42 'Inter',sans-serif;color:rgba(23,22,20,.78);letter-spacing:-.01em;}
+.ig-pill{position:absolute;display:inline-flex;align-items:center;gap:16px;background:#151210;border-radius:999px;
+  padding:24px 36px;font:500 21px/1 'PlexMono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#f3e7d3;
+  white-space:nowrap;}
+.ig-pill svg{width:28px;height:28px;}
+.ig-pe{position:absolute;font:500 18px/1 'PlexMono',monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-42);}
+.ig-lente{position:absolute;inset:0;pointer-events:none;}
+.ig-dm{position:absolute;font:500 34px/1 'Inter',sans-serif;color:#171614;letter-spacing:-.015em;white-space:nowrap;
+  transform:translate(-50%,-50%);}
+.ig-sw{position:absolute;box-shadow:0 18px 36px rgba(23,22,20,.16);}
+.ig-sw canvas{display:block;}
+.ig-swn{position:absolute;font:400 21px/1 'Inter',sans-serif;color:var(--ink);white-space:nowrap;}
+.ig-swh{position:absolute;font:500 15px/1 'PlexMono',monospace;letter-spacing:.06em;color:var(--ink-42);}
+.ig-passo{position:absolute;width:640px;}
+.ig-passo b{display:block;font:400 54px/1.05 'Anton','Inter',sans-serif;text-transform:uppercase;color:#151210;}
+.ig-passo span{display:block;margin-top:12px;font:400 30px/1.4 'Inter',sans-serif;color:rgba(23,22,20,.74);}
+.ig-inc{position:absolute;font:500 22px/2.05 'PlexMono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-60);}
+.ig-inc i{display:inline-block;width:12px;height:12px;border-radius:50%;background:#d4553c;margin-right:18px;vertical-align:1px;}
