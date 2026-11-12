@@ -694,6 +694,8 @@ function montaLoja() {
     $("dona-zap").textContent = "Quero colocar no ar";
     document.querySelector(".passos-dona").hidden = true;
   } else if (LOJA !== "Sua Loja") $("dona-t").textContent = "Esta pode ser a vitrine da " + LOJA;
+  /* ?e=1: a vitrine aparece dentro da moldura de celular da página do Ateliê, sem a faixa nem o convite */
+  if (Q.get("e")) { demo.hidden = true; $("dona").hidden = true; }
 }
 
 /* ===== estado ===== */

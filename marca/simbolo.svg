@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Ateliê Digital">
+  <!-- a etiqueta de roupa: a forma própria da marca -->
+  <rect width="120" height="120" rx="26" fill="#FAF8F5"/>
+  <g transform="rotate(-12 60 60)">
+    <path d="M44 22h36a8 8 0 0 1 8 8v60a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8V36z" fill="#9A4A26"/>
+    <circle cx="48" cy="38" r="5" fill="#FAF8F5"/>
+    <path d="M48 38C40 26 30 20 18 20" fill="none" stroke="#2B2623" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="61" y="84" text-anchor="middle" font-family="'Bodoni Moda','Bodoni 72',Didot,Georgia,serif" font-style="italic" font-weight="500" font-size="46" fill="#FAF8F5">A</text>
+  </g>
+</svg>

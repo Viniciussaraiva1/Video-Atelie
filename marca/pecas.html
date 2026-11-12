@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Peças da marca · Ateliê Digital</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,500&family=Corinthia:wght@700&family=Montserrat:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Uma peça por vez, escolhida no endereço: pecas.html?p=post-1-previa. scripts/marca.mjs fotografa todas.
+   A regra das peças: a marca mostra a vitrine da cliente. Toda peça tem uma vitrine de verdade ou o preço. */
+html,body{margin:0;overflow:hidden}
+:root{color-scheme:light}
+#peca{position:relative;width:var(--w);height:var(--h);padding:84px 80px;display:grid;grid-template-rows:auto 1fr auto;gap:36px;background:var(--papel);color:var(--tinta);overflow:hidden}
+#peca.papel2{background:var(--papel-2)}
+#peca.tinta{background:var(--tinta);color:var(--papel);--apoio:#CFC6BD;--marca:#E0A57E;--marca-suave:rgba(255,255,255,.1);--linha-2:rgba(255,255,255,.3)}
+#peca.terra{background:var(--marca);color:#fff;--apoio:#F6E3D8;--marca-suave:rgba(255,255,255,.16)}
+#peca.terra .t em{color:#FFE3D1}
+.cab{display:flex;justify-content:space-between;align-items:center;font-size:30px}
+.cab .rotulo{font-size:22px;color:inherit;opacity:.74}
+.cab .marca-letra em{color:inherit}
+#peca:not(.terra) .cab .marca-letra em{color:var(--marca)}
+.meio{display:grid;gap:40px;align-content:center;min-height:0}
+.meio.lado{grid-template-columns:1fr 430px;align-items:center}
+.t{font-size:var(--t,92px);font-weight:300;line-height:1.04;letter-spacing:-.025em;text-wrap:balance}
+.t em{font-family:var(--didone);font-style:italic;font-weight:500;color:var(--marca)}
+.sub{font-size:38px;line-height:1.3;color:var(--apoio);max-width:20ch}
+.celular{width:430px;border-radius:58px;padding:34px 12px 13px}
+.celular::before{top:13px;width:72px;height:8px;margin-left:-36px}
+.celular>iframe{border-radius:18px 18px 46px 46px}
+.itens{list-style:none;padding:0;display:grid;gap:22px;font-size:40px;font-weight:300}
+.itens li{display:grid;grid-template-columns:44px 1fr;gap:20px;align-items:center}
+.itens li::before{content:"";width:16px;height:16px;border-radius:50%;border:3px solid var(--marca);justify-self:center}
+.pe{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:30px}
+.pe .etiqueta{min-height:62px;padding:12px 28px 12px 54px;font-size:28px;border-radius:10px;clip-path:polygon(24px 0,100% 0,100% 100%,24px 100%,0 50%)}
+.pe .etiqueta::before{left:26px;width:12px;height:12px;margin-top:-6px;border-width:2.5px}
+.pe .chama{margin-left:auto;font-weight:500}
+.antes{display:grid;gap:14px;padding:30px 26px;border-radius:34px;background:var(--cartao);border:2px solid var(--linha)}
+.antes span{display:flex;align-items:center;justify-content:center;min-height:68px;border-radius:18px;border:2px solid var(--linha-2);font-size:25px;color:var(--tinta-2)}
+.antes span.morto{border-style:dashed;text-decoration:line-through;color:var(--apoio)}
+.antes .perfil{font-size:22px;color:var(--apoio);text-align:center;border:0;min-height:0}
+.bolhas{display:flex;flex-wrap:wrap;gap:18px}
+.bolhas span{padding:20px 34px;border-radius:44px 44px 44px 10px;background:rgba(255,255,255,.18);font-size:44px;font-weight:400}
+/* cartão de link (aparece quando o link é colado no WhatsApp) e foto de perfil */
+#peca.cartao{padding:64px 72px;grid-template-rows:1fr;grid-template-columns:1fr 300px;gap:48px;align-items:center}
+#peca.cartao .celular{width:300px;border-radius:42px;padding:24px 9px 10px;align-self:start;margin-top:8px}
+#peca.cartao .celular>iframe{border-radius:14px 14px 33px 33px}
+#peca.cartao .t{--t:70px}
+#peca.perfil{padding:0;display:grid;place-items:center;background:var(--papel)}
+#peca.perfil img{width:78%}
+</style>
+</head>
+<body>
+<div id="peca"></div>
+<script>
+/* [fundo, rótulo, título, {opções}] — o texto das peças segue docs/instagram.md e a oferta da página */
+var V = "../v/?e=1&";
+var PECAS = {
+  "cartao": { tipo: "cartao", w: 1200, h: 630, t: "A vitrine da sua loja, <em>montada.</em>", vit: "l=Sua+Loja", tags: ["Prévia grátis", "R$ 890 uma vez só"] },
+  "perfil": { tipo: "perfil", w: 1080, h: 1080 },
+  "post-1-previa": { rot: "Prévia grátis", t: "Me manda cinco peças. <em>Eu devolvo a sua vitrine.</em>", vit: "l=Sua+Loja", tags: ["Em até 2 dias úteis", "Não gostou, não paga"], chama: "Comente VITRINE" },
+  "post-2-bio": { fundo: "papel2", rot: "O link da bio", t: "Ela clicou pra ver roupa. <em>Achou uma lista de botões.</em>", antes: true, tags: ["Peça, preço e tamanho na mesma tela"], chama: "Comente VITRINE", tam: 80 },
+  "post-3-preco": { fundo: "tinta", rot: "Quanto custa", t: "R$ 890, <em>uma vez só.</em>", itens: ["Sem mensalidade na página", "Pix e cartão direto na sua conta", "Catálogo sem limite de peças", "No ar em 7 dias úteis"], tags: ["Antes de pagar, a prévia é grátis"], tam: 124 },
+  "post-4-perguntas": { fundo: "terra", rot: "Seu direct virou balcão", bolhas: ["quanto custa?", "tem no 40?", "aceita Pix?", "faz entrega?", "tem outra cor?"], t: "A vitrine responde <em>antes da pergunta.</em>", chama: "Prévia grátis · link na bio", tam: 84 },
+  "post-5-plus": { rot: "Para moda plus size", t: "Do 46 ao 60, <em>com medida em cada peça.</em>", vit: "n=plus&l=Sua+Loja+Plus&c=2F3E5C", tags: ["Prévia grátis com 5 peças suas"], chama: "Comente VITRINE" },
+  "post-6-festa": { fundo: "papel2", rot: "Para moda festa", t: "O longo certo, <em>sem vinte mensagens.</em>", vit: "n=festa&l=Sua+Loja+Festa&c=6E2433", tags: ["Prévia grátis com 5 peças suas"], chama: "Comente VITRINE" },
+  "post-7-praia": { rot: "Para moda praia", t: "O verão inteiro <em>num link só.</em>", vit: "n=praia&l=Sua+Loja+Praia&c=1F6B54", tags: ["Prévia grátis com 5 peças suas"], chama: "Comente VITRINE" },
+  "post-8-fitness": { fundo: "papel2", rot: "Para moda fitness", t: "Cor e tamanho escolhidos <em>antes do direct.</em>", vit: "n=fitness&l=Sua+Loja+Fit&c=A98BC4", tags: ["Prévia grátis com 5 peças suas"], chama: "Comente VITRINE" },
+  "post-9-modesta": { rot: "Para moda evangélica", t: "A coleção organizada, <em>peça por peça.</em>", vit: "n=modesta&l=Sua+Loja&c=2F3E5C", tags: ["Prévia grátis com 5 peças suas"], chama: "Comente VITRINE" }
+};
+var nome = new URLSearchParams(location.search).get("p") || "post-1-previa", d = PECAS[nome] || PECAS["post-1-previa"], el = document.getElementById("peca");
+var W = d.w || 1080, H = d.h || 1350;
+el.style.setProperty("--w", W + "px"); el.style.setProperty("--h", H + "px");
+el.className = (d.tipo || "") + " " + (d.fundo || "");
+function tags(l) { return (l || []).map(function (t, i) { return '<span class="etiqueta' + (i === 0 ? " cheia" : "") + '">' + t + "</span>"; }).join(""); }
+function fone(q) { return '<div class="celular"><iframe src="' + V + q + '" title=""></iframe></div>'; }
+if (d.tipo === "perfil") el.innerHTML = '<img src="simbolo.svg" alt="">';
+else if (d.tipo === "cartao") el.innerHTML = '<div class="pilha" style="--vao:28px"><span class="marca-letra" style="font-size:34px">Ateliê <em>Digital</em></span><h1 class="t">' + d.t + '</h1><p class="sub" style="font-size:30px;max-width:24ch">Peça, preço, tamanho e Pix na mesma tela.</p><div class="pe">' + tags(d.tags) + "</div></div>" + fone(d.vit);
+else {
+  var lado = d.vit || d.antes, corpo = '<div class="pilha" style="--vao:30px">' + (d.bolhas ? '<div class="bolhas">' + d.bolhas.map(function (b) { return "<span>" + b + "</span>"; }).join("") + "</div>" : "")
+    + '<h1 class="t" style="--t:' + (d.tam || (lado ? 78 : 104)) + 'px">' + d.t + "</h1>" + (d.itens ? '<ul class="itens">' + d.itens.map(function (i) { return "<li>" + i + "</li>"; }).join("") + "</ul>" : "") + "</div>";
+  var direita = d.vit ? fone(d.vit) : d.antes ? '<div class="antes"><span class="perfil">@sualoja · link na bio</span><span>WhatsApp</span><span>Catálogo (pasta do Drive)</span><span>Fotos das peças (álbum)</span><span class="morto">Loja (link que não abre)</span><span>Instagram</span></div>' : "";
+  el.innerHTML = '<div class="cab"><span class="marca-letra">Ateliê <em>Digital</em></span><span class="rotulo">' + d.rot + "</span></div>"
+    + '<div class="meio' + (lado ? " lado" : "") + '">' + corpo + direita + "</div>"
+    + '<div class="pe">' + tags(d.tags) + (d.chama ? '<span class="chama">' + d.chama + " →</span>" : "") + "</div>";
+}
+document.title = nome + " " + W + "x" + H;
+window.PECAS_NOMES = Object.keys(PECAS); window.PECA_TAMANHO = [W, H];
+</script>
+</body>
+</html>
