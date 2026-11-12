@@ -1,0 +1,331 @@
+<title>Caça-clientes do Ateliê</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bagel+Fat+One&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: mesa de trabalho. No topo o funil e o que fazer hoje; abaixo, uma ficha por loja, filtrada por etapa. */
+:root{
+  --papel:#ece7e0; --folha:#f7f3ee; --tinta:#171614; --tinta-2:rgba(23,22,20,.68); --tinta-3:rgba(23,22,20,.46);
+  --fio:rgba(23,22,20,.13); --massa:#c4432b; --verde:#2f7a70; --ouro:#a77d12; --tela:#ffffff;
+  --f-massa:'Bagel Fat One','Arial Rounded MT Bold',system-ui,sans-serif;
+  --f-cartaz:'Anton','Impact','Arial Narrow',sans-serif;
+  --f-texto:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --papel:#1a1816; --folha:#24211e; --tinta:#efe9e1; --tinta-2:rgba(239,233,225,.72); --tinta-3:rgba(239,233,225,.5);
+  --fio:rgba(239,233,225,.14); --massa:#e5694f; --verde:#5fb3a7; --ouro:#d9b347; --tela:#121110; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --papel:#1a1816; --folha:#24211e; --tinta:#efe9e1; --tinta-2:rgba(239,233,225,.72); --tinta-3:rgba(239,233,225,.5);
+  --fio:rgba(239,233,225,.14); --massa:#e5694f; --verde:#5fb3a7; --ouro:#d9b347; --tela:#121110; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font:400 15px/1.55 var(--f-texto);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+p{margin:0}
+.rot{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-3)}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--massa);outline-offset:2px}
+
+header{padding-block:40px 24px;display:grid;gap:10px}
+header h1{font:400 clamp(38px,7vw,72px)/.95 var(--f-massa);color:var(--massa)}
+header p{color:var(--tinta-2);max-width:64ch}
+.estado{font:500 12px/1.4 var(--f-mono);color:var(--tinta-3)}
+
+.funil{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--fio);border-radius:14px;background:var(--folha);overflow:hidden}
+.funil button{background:none;border:0;border-right:1px solid var(--fio);padding:14px 12px;text-align:left;display:grid;gap:2px}
+.funil button:last-child{border-right:0}
+.funil button[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+.funil button[aria-pressed="true"] .rot{color:inherit;opacity:.7}
+.funil b{font:400 34px/1 var(--f-cartaz);font-variant-numeric:tabular-nums}
+
+section{padding-top:36px;display:grid;gap:16px}
+.cab{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
+.cab h2{font:400 30px/1 var(--f-cartaz);text-transform:uppercase}
+
+.hoje{display:grid;gap:8px}
+.tarefa{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--folha);
+  border:1px solid var(--fio);border-radius:12px;padding:12px 14px}
+.tarefa .tag{font:500 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;padding:6px 8px;border-radius:999px;color:#fff;background:var(--c,var(--tinta))}
+.tarefa .t{min-width:0}
+.tarefa .t b{font-weight:600}
+.tarefa .t span{color:var(--tinta-2)}
+.vazio{color:var(--tinta-2);background:var(--folha);border:1px dashed var(--fio);border-radius:12px;padding:18px}
+
+.fichas{display:grid;gap:12px}
+.ficha{background:var(--folha);border:1px solid var(--fio);border-radius:14px;overflow:hidden}
+.ficha>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px}
+.ficha>summary::-webkit-details-marker{display:none}
+.nota{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:400 16px/1 var(--f-massa);color:#fff;background:var(--massa)}
+.nota.B{background:var(--ouro)}.nota.C{background:var(--tinta-3)}
+.ficha .nm{min-width:0}
+.ficha .nm b{font-weight:600;font-size:16px}
+.ficha .nm span{display:block;color:var(--tinta-2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etapa{font:500 10px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--fio);border-radius:999px;padding:6px 9px;white-space:nowrap}
+.etapa.quente{background:var(--verde);border-color:var(--verde);color:#fff}
+.corpo{padding:0 16px 16px;display:grid;gap:14px}
+.sinal{color:var(--tinta-2)}
+.msg{background:var(--tela);border:1px solid var(--fio);border-radius:10px;padding:14px;white-space:pre-wrap;font-size:15px}
+.acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bt{background:transparent;border:1px solid var(--tinta-3);border-radius:999px;padding:8px 14px;font:500 12px/1 var(--f-mono);
+  letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--tinta);display:inline-flex;align-items:center;gap:6px}
+.bt:hover{border-color:var(--tinta)}
+.bt.cheio{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.bt.massa{background:var(--massa);color:#fff;border-color:var(--massa)}
+.bt[disabled]{opacity:.45;cursor:not-allowed}
+select.bt{appearance:auto;padding:7px 10px}
+.hist{display:grid;gap:4px;font-size:13px;color:var(--tinta-2)}
+.hist div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px}
+.hist em{font:500 11px/1.6 var(--f-mono);font-style:normal;color:var(--tinta-3)}
+label.cx{display:grid;gap:6px}
+textarea,input[type=text]{width:100%;background:var(--tela);border:1px solid var(--fio);border-radius:10px;padding:10px 12px;resize:vertical}
+.resp{display:grid;gap:8px;border-top:1px solid var(--fio);padding-top:14px}
+
+.cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.runs{display:grid;gap:6px}
+.runs div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;font-size:14px;color:var(--tinta-2);border-top:1px solid var(--fio);padding-top:8px}
+.runs em{font:500 12px/1.5 var(--f-mono);font-style:normal;color:var(--tinta-3)}
+.aviso{background:var(--folha);border-left:3px solid var(--ouro);padding:12px 14px;border-radius:0 10px 10px 0;color:var(--tinta-2)}
+
+@media (max-width:760px){
+  .funil{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .funil button:nth-child(4){border-right:0}
+  .funil button:nth-child(-n+4){border-bottom:1px solid var(--fio)}
+  .tarefa{grid-template-columns:minmax(0,1fr)}
+  .ficha>summary{grid-template-columns:auto minmax(0,1fr)}
+  .ficha>summary .etapa{grid-column:2;justify-self:start}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="rot">Ateliê Digital · prospecção</span>
+  <h1>Caça-clientes</h1>
+  <p>Toda manhã a rotina monta a fila do dia: quem abordar, por qual canal e com qual mensagem. Você envia, conversa e marca o que aconteceu. Nada sai em seu nome sem passar por aqui.</p>
+  <span class="estado" id="estado">Carregando as fichas…</span>
+</header>
+
+<nav class="funil" id="funil" aria-label="Etapas do funil"></nav>
+
+<section aria-labelledby="h-hoje">
+  <div class="cab"><h2 id="h-hoje">Para hoje</h2><span class="rot" id="hoje-n"></span></div>
+  <div class="hoje" id="hoje"></div>
+</section>
+
+<section aria-labelledby="h-fichas">
+  <div class="cab"><h2 id="h-fichas">Lojas</h2>
+    <select class="bt" id="frente" aria-label="Filtrar por frente">
+      <option value="">Todas as frentes</option><option value="instagram">Instagram</option>
+      <option value="email">E-mail</option><option value="projeto">Projetos (Workana, 99Freelas)</option>
+    </select></div>
+  <div class="fichas" id="fichas"></div>
+</section>
+
+<section aria-labelledby="h-cfg">
+  <div class="cab"><h2 id="h-cfg">Ajustes</h2><span class="rot">a rotina lê estes campos a cada dia</span></div>
+  <div class="aviso" id="aviso-promessas">As mensagens prometem prévia grátis em até 2 dias úteis e 50% para começar. Se alguma dessas condições mudar, ajuste abaixo antes de aprovar envios.</div>
+  <div class="cfg">
+    <label class="cx"><span class="rot">Assinatura das mensagens</span><input type="text" id="c-assina" placeholder="Ex.: Vinicius, do Ateliê Digital"></label>
+    <label class="cx"><span class="rot">Link da página com a prévia</span><input type="text" id="c-link" placeholder="https://…"></label>
+    <label class="cx"><span class="rot">WhatsApp para contato</span><input type="text" id="c-whats" placeholder="(31) 9…"></label>
+    <label class="cx"><span class="rot">Condições que posso prometer</span><textarea id="c-cond" rows="3"></textarea></label>
+    <label class="cx"><span class="rot">Lojas por dia</span><input type="text" id="c-dia" inputmode="numeric"></label>
+    <label class="cx"><span class="rot">Envio de e-mail</span><select class="bt" id="c-modo"><option value="aprovar">Só depois que eu aprovar cada um</option><option value="auto">Automático, sem aprovação</option></select></label>
+  </div>
+  <div class="acoes"><button class="bt cheio" id="c-salva" type="button">Salvar ajustes</button><span class="estado" id="c-ok"></span></div>
+</section>
+
+<section aria-labelledby="h-runs">
+  <div class="cab"><h2 id="h-runs">Diário da rotina</h2></div>
+  <div class="runs" id="runs"><p class="vazio">A rotina escreve aqui o que fez em cada manhã.</p></div>
+</section>
+</div>
+
+<script>
+const ETAPAS = [
+  ['novo','Novas'],['aprovado','Aprovadas'],['enviado','Enviadas'],['respondeu','Responderam'],
+  ['previa','Prévia'],['proposta','Proposta'],['fechado','Fechadas']
+];
+const TODAS = ETAPAS.concat([['descartado','Descartadas']]);
+const nomeEtapa = k => (TODAS.find(e => e[0] === k) || [k, k])[1];
+const QUENTES = ['respondeu','previa','proposta','fechado'];
+const DIA = 864e5;
+let db = null, sample = null, leads = [], filtro = 'novo', frente = '', cfg = {}, abertos = new Set();
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => { const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (v != null) n.setAttribute(k, v); }
+  kids.flat().forEach(k => k != null && n.append(k.nodeType ? k : String(k))); return n; };
+const hojeISO = () => new Date().toISOString();
+const dataBR = s => s ? new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '';
+const dias = s => s ? Math.floor((Date.now() - new Date(s)) / DIA) : 0;
+
+function copiar(txt, bt) {
+  const ok = m => { const t = bt.textContent; bt.textContent = m; setTimeout(() => bt.textContent = t, 1500); };
+  try { navigator.clipboard.writeText(txt).then(() => ok('Copiado'), () => ok('Selecione e copie')); } catch (e) { ok('Selecione e copie'); }
+}
+function waLink(num, txt) {
+  const d = String(num || '').replace(/\D/g, ''); if (d.length < 10) return null;
+  return 'https://wa.me/' + (d.startsWith('55') ? d : '55' + d) + '?text=' + encodeURIComponent(txt || '');
+}
+/* a mensagem que vale agora: a primeira, ou o retorno que venceu */
+function proximaMsg(l) {
+  if (l.status === 'enviado') {
+    const d = dias(l.enviadoEm);
+    if (d >= 7 && (l.retornos || 0) < 2 && l.msg3) return { txt: l.msg3, rot: 'Segundo retorno', n: 2 };
+    if (d >= 3 && (l.retornos || 0) < 1 && l.msg2) return { txt: l.msg2, rot: 'Primeiro retorno', n: 1 };
+    return null;
+  }
+  if (l.status === 'novo' || l.status === 'aprovado') return { txt: l.msg1, rot: 'Primeira mensagem', n: 0 };
+  if (l.rascunho) return { txt: l.rascunho, rot: 'Resposta sugerida', n: -1 };
+  return null;
+}
+
+async function grava(l, campos, nota) {
+  if (!db) return;
+  const hist = (l.historico || []).concat(nota ? [{ em: hojeISO(), txt: nota }] : []).slice(-40);
+  try { await db.doc('leads/' + l.id).update({ ...campos, historico: hist, atualizado: hojeISO() }); }
+  catch (e) { $('estado').textContent = 'Não consegui salvar (' + e.code + '). Tente de novo.'; }
+}
+
+function render() {
+  const n = k => leads.filter(l => l.status === k).length;
+  const fun = $('funil'); fun.replaceChildren(...ETAPAS.map(([k, t]) =>
+    el('button', { type: 'button', 'aria-pressed': String(filtro === k), onclick: () => { filtro = k; render(); } }, el('span', { class: 'rot' }, t), el('b', {}, n(k)))));
+
+  /* o que fazer hoje */
+  /* a rotina marca em "fila" as lojas do dia; havendo fila, só elas entram como envio novo */
+  const tarefas = [], temFila = leads.some(l => l.fila && l.status === 'novo');
+  leads.forEach(l => {
+    const pm = proximaMsg(l);
+    if (l.status === 'novo' && l.frente === 'instagram') { if (!temFila || l.fila) tarefas.push([l, l.whatsapp ? 'Enviar WhatsApp' : 'Enviar DM', 'var(--massa)']); }
+    else if (l.status === 'novo' && l.frente === 'email' && cfg.modo !== 'auto') tarefas.push([l, 'Aprovar e-mail', 'var(--massa)']);
+    else if (l.status === 'novo' && l.frente === 'projeto') tarefas.push([l, 'Mandar proposta', 'var(--massa)']);
+    else if (pm && pm.n > 0) tarefas.push([l, pm.rot, 'var(--ouro)']);
+    else if (QUENTES.includes(l.status) && l.status !== 'fechado' && l.rascunho) tarefas.push([l, 'Responder', 'var(--verde)']);
+  });
+  const ordem = t => t[2] === 'var(--verde)' ? 0 : t[2] === 'var(--ouro)' ? 1 : 2;
+  tarefas.sort((a, b) => ordem(a) - ordem(b) || (b[0].prio || 0) - (a[0].prio || 0) || (a[0].nota || 'C').localeCompare(b[0].nota || 'C'));
+  $('hoje-n').textContent = tarefas.length ? tarefas.length + ' ações' + (temFila ? ' · fila montada pela rotina' : '') : '';
+  $('hoje').replaceChildren(...(tarefas.length ? tarefas.slice(0, 24).map(([l, t, c]) =>
+    el('div', { class: 'tarefa' }, el('span', { class: 'tag', style: '--c:' + c }, t),
+      el('div', { class: 't' }, el('b', {}, l.nome), el('span', {}, ' · ' + (l.cidade || l.frente) + (l.prio ? ' · prioridade ' + l.prio : ''))),
+      el('button', { class: 'bt', type: 'button', onclick: () => { filtro = l.status; abertos.add(l.id); render(); document.getElementById('f-' + l.id)?.scrollIntoView({ block: 'start' }); } }, 'Abrir ficha')))
+    : [el('p', { class: 'vazio' }, leads.length ? 'Nada pendente agora. A rotina traz lojas novas pela manhã.' : 'Nenhuma loja ainda. A rotina preenche esta lista.')]));
+
+  /* fichas da etapa escolhida */
+  const lista = leads.filter(l => l.status === filtro && (!frente || l.frente === frente))
+    .sort((a, b) => (b.prio || 0) - (a.prio || 0) || (a.nota || 'C').localeCompare(b.nota || 'C') || String(b.criado).localeCompare(String(a.criado)));
+  $('fichas').replaceChildren(...(lista.length ? lista.map(ficha) : [el('p', { class: 'vazio' }, 'Nenhuma loja em “' + nomeEtapa(filtro) + '”.')]));
+}
+
+function ficha(l) {
+  const pm = proximaMsg(l);
+  const d = el('details', { class: 'ficha', id: 'f-' + l.id });
+  if (abertos.has(l.id)) d.open = true;
+  d.addEventListener('toggle', () => d.open ? abertos.add(l.id) : abertos.delete(l.id));
+  const sub = [l.cidade, l.ig ? '@' + l.ig : null, l.seguidores, l.frente === 'projeto' ? 'projeto' : null].filter(Boolean).join(' · ');
+  d.append(el('summary', {}, el('span', { class: 'nota ' + (l.nota || 'C'), title: 'Nota ' + (l.nota || 'C') }, l.nota || 'C'),
+    el('div', { class: 'nm' }, el('b', {}, l.nome), el('span', {}, sub)),
+    el('span', { class: 'etapa' + (QUENTES.includes(l.status) ? ' quente' : '') }, nomeEtapa(l.status))));
+
+  const corpo = el('div', { class: 'corpo' });
+  if (l.sinal) corpo.append(el('p', { class: 'sinal' }, el('b', {}, 'Por que é cliente: '), l.sinal));
+  if (l.oferta) corpo.append(el('p', { class: 'sinal' }, el('b', {}, 'O que oferecer: '), l.oferta));
+
+  if (pm && pm.txt) {
+    corpo.append(el('span', { class: 'rot' }, pm.rot + (l.frente === 'email' && l.assunto && pm.n === 0 ? ' · assunto: ' + l.assunto : '')), el('div', { class: 'msg' }, pm.txt));
+    const ac = el('div', { class: 'acoes' });
+    const bc = el('button', { class: 'bt cheio', type: 'button' }, 'Copiar mensagem'); bc.onclick = () => copiar(pm.txt, bc); ac.append(bc);
+    /* o WhatsApp vem primeiro: abre a conversa com a mensagem já escrita. O canal usado fica gravado no envio. */
+    const wa = waLink(l.whatsapp, pm.txt); if (wa) ac.append(el('a', { class: 'bt cheio', href: wa, target: '_blank', rel: 'noopener', onclick: () => { l._canal = 'whatsapp'; } }, 'Abrir WhatsApp com a mensagem'));
+    if (l.ig) ac.append(el('a', { class: 'bt', href: 'https://www.instagram.com/' + l.ig + '/', target: '_blank', rel: 'noopener', onclick: () => { l._canal = 'instagram'; } }, 'Abrir Instagram'));
+    if (l.previa) ac.append(el('a', { class: 'bt', href: /^https?:/.test(l.previa) ? l.previa : (cfg.site || '') + l.previa, target: '_blank', rel: 'noopener' }, 'Ver a prévia'));
+    if (l.url) ac.append(el('a', { class: 'bt', href: l.url, target: '_blank', rel: 'noopener' }, l.frente === 'projeto' ? 'Abrir projeto' : 'Fonte'));
+    if (l.frente === 'email' && pm.n === 0 && l.status === 'novo')
+      ac.append(el('button', { class: 'bt massa', type: 'button', onclick: () => grava(l, { status: 'aprovado' }, 'E-mail aprovado para a rotina enviar') }, 'Aprovar envio'));
+    else if (pm.n >= 0 && l.frente !== 'email')
+      ac.append(el('button', { class: 'bt massa', type: 'button', onclick: () => pm.n === 0
+        ? grava(l, { status: 'enviado', enviadoEm: hojeISO(), retornos: 0, canal: l._canal || (l.whatsapp ? 'whatsapp' : 'instagram') }, 'Primeira mensagem enviada')
+        : grava(l, { retornos: pm.n }, pm.rot + ' enviado') }, 'Já enviei'));
+    corpo.append(ac);
+  }
+
+  /* a cliente respondeu: cola a resposta e o Claude sugere o próximo passo */
+  const resp = el('div', { class: 'resp' });
+  const ta = el('textarea', { rows: '3', id: 'r-' + l.id, placeholder: 'Cole aqui o que a loja respondeu…' });
+  const saida = el('div', { class: 'msg', hidden: '' });
+  const bs = el('button', { class: 'bt cheio', type: 'button' }, 'Sugerir resposta');
+  bs.onclick = async () => {
+    const txt = ta.value.trim(); if (!txt) { ta.focus(); return; }
+    await grava(l, { status: QUENTES.includes(l.status) ? l.status : 'respondeu', ultimaResposta: txt, respondeuEm: l.respondeuEm || hojeISO() }, 'Loja respondeu: ' + txt.slice(0, 160));
+    if (!sample) { saida.hidden = false; saida.textContent = 'Resposta guardada. A rotina escreve a sugestão na próxima manhã.'; return; }
+    bs.disabled = true; saida.hidden = false; saida.textContent = 'Escrevendo…';
+    try {
+      const r = await sample(promptResposta(l, txt), { modelTier: 'default', cache: false, onText: ({ text }) => { saida.textContent = text; } });
+      saida.textContent = r.text;
+      await grava(l, { rascunho: r.text }, null);
+    } catch (e) { saida.textContent = e.code === 'not_granted' ? 'Resposta guardada. A rotina escreve a sugestão na próxima manhã.' : 'Não consegui escrever agora. Tente de novo em instantes.'; }
+    bs.disabled = false;
+  };
+  const bcp = el('button', { class: 'bt', type: 'button' }, 'Copiar sugestão'); bcp.onclick = () => copiar(saida.textContent, bcp);
+  resp.append(el('label', { class: 'cx', for: 'r-' + l.id }, el('span', { class: 'rot' }, 'A loja respondeu?')), ta, el('div', { class: 'acoes' }, bs, bcp), saida);
+  corpo.append(resp);
+
+  /* mudar de etapa à mão */
+  const sel = el('select', { class: 'bt', 'aria-label': 'Mudar etapa' }, TODAS.map(([k, t]) => { const o = el('option', { value: k }, t); if (k === l.status) o.selected = true; return o; }));
+  sel.onchange = () => grava(l, { status: sel.value }, 'Etapa: ' + nomeEtapa(sel.value));
+  corpo.append(el('div', { class: 'acoes' }, el('span', { class: 'rot' }, 'Etapa'), sel));
+
+  if ((l.historico || []).length) corpo.append(el('div', { class: 'hist' }, l.historico.slice().reverse().slice(0, 8).map(h => el('div', {}, el('em', {}, dataBR(h.em)), el('span', {}, h.txt)))));
+  d.append(corpo);
+  return d;
+}
+
+function promptResposta(l, txt) {
+  return `Você ajuda o Ateliê Digital a vender. O Ateliê monta vitrines (páginas de venda) para boutiques que vendem pelo Instagram.
+Oferta: Página de venda R$ 890, pagamento único, sem mensalidade, com carrinho, Pix e cartão direto na conta da loja, frete pelo CEP, catálogo sem limite, no ar em 7 dias úteis. Identidade e site R$ 2.490 (inclui cartela exclusiva, manual da marca e ficha de cada peça). Opcionais mensais: Plano Temporada R$ 490/mês, Radar de compra + R$ 340/mês, sem fidelidade.
+Condições que podem ser prometidas: ${cfg.cond || 'prévia grátis com 5 peças em até 2 dias úteis; 50% para começar e o resto com a página no ar; uma rodada de ajuste.'}
+Regras: não dê desconto nem prometa nada fora disso; se pedirem algo fora, diga que confirma e volta. Português do Brasil, tom de conversa de direct, curto (até 5 linhas), sem emoji em excesso, uma pergunta no fim que leve ao próximo passo (mandar as 5 fotos, marcar uma conversa ou aprovar a proposta). ${cfg.link ? 'Link da página: ' + cfg.link + '.' : ''} ${cfg.assina ? 'Assine como: ' + cfg.assina + '.' : ''}
+Loja: ${l.nome} (${l.cidade || ''}${l.ig ? ', @' + l.ig : ''}). O que sabemos: ${l.sinal || ''}
+Etapa atual: ${nomeEtapa(l.status)}. Últimos registros: ${(l.historico || []).slice(-5).map(h => h.txt).join(' | ')}
+A loja acabou de escrever: "${txt}"
+Escreva só a resposta a ser enviada, sem comentários.`;
+}
+
+function preencheCfg() {
+  $('c-assina').value = cfg.assina || ''; $('c-link').value = cfg.link || ''; $('c-whats').value = cfg.whats || '';
+  $('c-cond').value = cfg.cond || ''; $('c-dia').value = cfg.porDia || 8; $('c-modo').value = cfg.modo || 'aprovar';
+}
+$('c-salva').onclick = async () => {
+  if (!db) return;
+  const novo = { assina: $('c-assina').value.trim(), link: $('c-link').value.trim(), whats: $('c-whats').value.trim(),
+    cond: $('c-cond').value.trim(), porDia: Math.max(1, Math.min(30, parseInt($('c-dia').value, 10) || 8)), modo: $('c-modo').value, atualizado: hojeISO() };
+  try { await db.doc('config/geral').update(novo); $('c-ok').textContent = 'Salvo.'; }
+  catch (e) { $('c-ok').textContent = 'Não salvou (' + e.code + ').'; }
+};
+$('frente').onchange = e => { frente = e.target.value; render(); };
+
+render(); preencheCfg();
+(async () => {
+  db = await claude.use('db');
+  if (!db) { $('estado').textContent = 'Abra pelo claude.ai com a sua conta para ver as fichas.'; return; }
+  const timer = setTimeout(() => { $('estado').textContent = 'As fichas estão demorando para chegar. Elas aparecem assim que a conexão responder.'; }, 10000);
+  db.collection('leads').onSnapshot(s => {
+    if (!s.metadata.fromCache) clearTimeout(timer);
+    leads = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const abordadas = leads.filter(l => l.enviadoEm || l.status === 'enviado' || QUENTES.includes(l.status)).length, responderam = leads.filter(l => QUENTES.includes(l.status) || l.respondeuEm || l.ultimaResposta).length;
+    $('estado').textContent = leads.length + ' lojas no funil · ' + abordadas + ' abordadas · ' + responderam + ' responderam' + (abordadas ? ' (' + Math.round(100 * responderam / abordadas) + '%)' : '') + ' · atualizado ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    render();
+  }, e => { clearTimeout(timer); $('estado').textContent = 'Não consegui ler as fichas (' + e.code + ').'; });
+  db.doc('config/geral').onSnapshot(s => { cfg = s.exists ? s.data() : {}; preencheCfg(); render(); }, () => {});
+  db.doc('log/rotina').onSnapshot(s => {
+    const runs = s.exists ? (s.data().runs || []) : [];
+    if (runs.length) $('runs').replaceChildren(...runs.slice().reverse().slice(0, 14).map(r =>
+      el('div', {}, el('em', {}, new Date(r.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })), el('span', {}, r.txt))));
+  }, () => {});
+  sample = await claude.use('sample');
+})();
+</script>

@@ -1,65 +1,118 @@
 # Prospecção do Ateliê Digital
 
-A rotina diária procura boutiques, escreve a primeira mensagem de cada uma e lembra dos retornos.
-Tudo fica no painel **Caça-clientes** (artefato privado: https://claude.ai/artifact/6K4QzMzteg5woABzsmmvSu).
-O fluxo copia o do repositório IA-job (achar, ranquear, escrever sob medida, acompanhar o resultado),
-trocando vagas de emprego por lojas.
+Como a máquina funciona no dia a dia. O porquê de cada escolha está em
+[`diagnostico.md`](diagnostico.md).
 
-## Quem é cliente
+## O dia, em quinze minutos
 
-Boutique ou marca feminina pequena ou média que **vende pelo Instagram e fecha pelo WhatsApp ou pelo direct**,
-sem loja online própria (ou com uma lista de links no lugar dela).
+1. **7h39** (segunda a sábado): a rotina monta a fila e manda o resumo para o seu celular.
+2. Abra o painel **Caça-clientes** (https://claude.ai/artifact/6K4QzMzteg5woABzsmmvSu). Em
+   "Para hoje", a ordem já é a certa:
+   - **Responder** (verde): quem respondeu vem antes de tudo.
+   - **Retornos** (ouro): o lembrete do dia 3 e a última mensagem do dia 7.
+   - **Enviar** (vermelho): as lojas da fila do dia, da maior prioridade para a menor.
+3. Em cada ficha: "Abrir WhatsApp com a mensagem" (ou "Copiar mensagem" e "Abrir Instagram"),
+   envie, e toque em **Já enviei**.
+4. A loja respondeu? Cole a resposta na ficha e use **Sugerir resposta**. É esse registro que
+   ensina a revisão semanal.
 
-| Nota | Sinal |
-|---|---|
-| A | A bio manda comprar pelo WhatsApp ou direct, tem volume (milhares de seguidores, envio para o Brasil, mais de uma loja) |
-| B | Vende pelo Instagram, mas já tem algum link de compra, ou falta informação |
-| C | Perfil muito pequeno ou sinal fraco |
+Envie uma por vez, à mão, e no máximo a fila do dia. Quem disser que não quer sai da lista e não
+recebe mais nada.
 
-Fora: redes grandes, só atacado, só moda masculina, quem já tem loja online completa funcionando.
+## O que roda sozinho
 
-## Frentes
+| Quando | O quê | Onde está escrito |
+| --- | --- | --- |
+| Segunda a sábado, 7h39 | Rotina diária: fila, mensagens, retornos, projetos da 99Freelas | [`rotina/diaria.md`](../rotina/diaria.md) |
+| Domingo, 19h47 | Revisão semanal: funil, pesos, modelos de mensagem, legendas | [`rotina/semanal.md`](../rotina/semanal.md) |
 
-1. **Instagram (DM).** A rotina acha a loja e escreve a mensagem. Quem envia é você, do perfil do Ateliê,
-   pelo botão "Copiar mensagem" e "Abrir Instagram" do painel. O Instagram não permite mensagem
-   automática para quem não falou com você antes, nem por ferramenta oficial; robô que manda DM
-   em massa derruba o perfil.
-2. **E-mail.** Lojas que publicam e-mail comercial no próprio site. A rotina envia pelo seu Gmail
-   **depois que você aprova a ficha** (ou sem aprovação, se você trocar o modo nos Ajustes).
-   Aprovar a ficha vale para a primeira mensagem e até dois retornos; qualquer resposta ou
-   pedido para parar encerra a sequência. Todo e-mail tem uma linha para a pessoa pedir para não receber mais.
-3. **Projetos (99Freelas, Workana).** A busca pública da 99Freelas pode ser lida: a rotina abre as buscas
-   de moda, loja de roupas, boutique, reels, identidade visual e loja virtual, confere se o projeto
-   ainda aceita proposta e escreve a proposta, que você envia pela plataforma (anexe o Reel curto
-   como portfólio). Preço de serviço fora da tabela vem marcado "preço sugerido, confirme".
-   A Workana bloqueia a leitura: ative lá os alertas por e-mail de "loja virtual", "site" e "catálogo"
-   de moda, que a rotina lê no Gmail.
-4. **Quem chega sozinho.** Comentário "VITRINE" ou "PRÉVIA" nos posts → resposta automática no direct
-   com o link da prévia. Isso a Meta permite, porque a pessoa falou primeiro. Configure uma vez no
-   ManyChat (parceiro oficial da Meta, plano grátis): gatilho "comentário com palavra-chave", palavras
-   VITRINE e PRÉVIA, em todos os posts, mensagem:
-   > Oi! Que bom que quer ver a sua vitrine. Me manda 5 fotos de peças (pode ser print do feed) e o nome
-   > da loja, que eu devolvo a prévia montada em até 2 dias úteis, de graça.
+As duas são tarefas agendadas do Claude e leem e escrevem só o banco do painel. Elas não têm
+conector de e-mail. Os textos em `rotina/` são a cópia do que está agendado: mudou um, mude o outro.
 
-## Sequência de mensagens
+### Como a fila é escolhida
 
-| Quando | Mensagem |
-|---|---|
-| Dia 0 | Gancho tirado da bio da loja + o que a vitrine faz + prévia grátis com 5 peças + "posso montar?" |
-| Dia 3 sem resposta | Lembrete curto apontando o Reel fixado |
-| Dia 7 sem resposta | Última, avisando que não volta a insistir |
+Cada loja ganha uma nota de 0 a 100, somando os pesos de `config/pesos` no banco do painel:
 
-Quando a loja responde: cole a resposta na ficha e use "Sugerir resposta". O objetivo de cada
-conversa é um passo: receber as 5 fotos → mandar a prévia → mandar a proposta → 50% para começar.
+| Sinal | Peso inicial |
+| --- | --- |
+| Tem WhatsApp comercial publicado | 25 |
+| O link de compra dela está quebrado (conferido no dia) | 25 |
+| Fica na sua região (`config.regiao`) | 20 |
+| Catálogo improvisado (Drive, álbum, destaques) | 15 |
+| Várias vendedoras ou grupo VIP | 12 |
+| Nota A | 10 |
+| Só uma lista de links | 8 |
+| Sinal conferido nos últimos 7 dias | 5 |
+
+A revisão semanal sobe ou desce cada peso em até 5 pontos, conforme o que rendeu resposta.
+
+### Os modelos de mensagem
+
+Ficam em `config/variantes` e são sorteados pelo peso. Os quatro iniciais (cópia em
+[`rotina/padroes.json`](../rotina/padroes.json)):
+
+| Modelo | Ideia que testa |
+| --- | --- |
+| `v1-pergunta` | A mensagem antiga: pede permissão antes de mostrar |
+| `v2-rascunho` | Mostra o rascunho da vitrine da loja já montado |
+| `v3-defeito` | Só para link quebrado: começa pelo defeito conferido no dia |
+| `v4-curta` | Duas linhas e o link |
+
+A revisão semanal redistribui os pesos, aposenta o modelo que rende menos da metade do melhor e
+cria uma desafiante por vez. Com menos de 30 envios na semana ela não mexe em nada.
+
+## A prévia
+
+```bash
+node scripts/previa.mjs link "Eva Store" --ig evastoremaraba --nicho casual
+```
+
+Devolve o link da prévia-relâmpago: a vitrine com o nome da loja e peças de exemplo desenhadas.
+Nichos: `casual`, `festa`, `plus`, `praia`, `fitness`, `modesta`. Nada é gerado: o endereço carrega
+os dados, e a rotina monta esse link sozinha para cada loja da fila.
+
+Quando a loja manda as fotos:
+
+```bash
+node scripts/previa.mjs nova "Eva Store" --ig evastoremaraba
+```
+
+```bash
+node scripts/previa.mjs gera previa/lojas/eva-store.json
+```
+
+O primeiro comando cria `previa/eva-store/img/` (ponha as fotos ali) e o JSON com uma peça por
+foto. Ajuste nome e preço, rode o segundo, faça o commit e o link `…/previa/eva-store/` está pronto.
+
+## Lojas da sua região, para visitar com a vitrine no celular
+
+| Loja | Instagram | Prévia |
+| --- | --- | --- |
+| Núbia Ribeiro (Marabá) | @nubiaribeirooficial | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=N%C3%BAbia+Ribeiro&i=nubiaribeirooficial&r=ig-nubiaribeirooficial |
+| Exclusiva Fashion (Marabá) | @exclusivamaraba | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Exclusiva+Fashion&i=exclusivamaraba&r=ig-exclusivamaraba |
+| Eva Store (Marabá) | @evastoremaraba | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Eva+Store&i=evastoremaraba&r=ig-evastoremaraba |
+| Modinha (Marabá) | @modinha.mba | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Modinha&i=modinha.mba&r=ig-modinha.mba |
+| Charmosa (Marabá) | @charmosa.mab | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Charmosa&i=charmosa.mab&r=ig-charmosa.mab |
+| Donna Parauapebas | @donnastorepa | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Donna+Parauapebas&i=donnastorepa&r=ig-donnastorepa |
+| Bella Mafia Moda Fitness (Eldorado e Canaã) | @bellamafiamodafitnnes | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Bella+Mafia&i=bellamafiamodafitnnes&n=fitness&r=ig-bellamafiamodafitnnes |
+| Big Loja (Canaã dos Carajás) | @bigloja.canaa | https://viniciussaraiva1.github.io/Video-Atelie/v/?l=Big+Loja&i=bigloja.canaa&r=ig-bigloja.canaa |
+
+Os links só abrem depois que o GitHub Pages estiver ligado. A ficha de cada loja está no painel;
+confira o perfil antes de ir, porque algumas vieram de diretório.
+
+## Quem chega sozinho
+
+Comentário "VITRINE" ou "PRÉVIA" nos posts → resposta automática no direct com o link do site. A
+Meta permite porque a pessoa falou primeiro. Configure uma vez no ManyChat (parceiro oficial da
+Meta, plano grátis): gatilho "comentário com palavra-chave", em todos os posts, mensagem:
+
+> Oi! Que bom que quer ver a sua vitrine. Me manda o nome da loja e 5 fotos de peças (pode ser
+> print do feed) que eu devolvo a prévia montada em até 2 dias úteis, de graça.
 
 ## O que a rotina nunca faz
 
-- Enviar DM ou WhatsApp, entrar em conta, criar conta ou contornar bloqueio de site.
-- Inventar fato sobre a loja: o gancho sai só do que a própria loja publica.
-- Dar desconto ou prometer prazo e condição fora do campo "Condições" dos Ajustes.
-- Fechar negócio sozinha. Proposta aceita, pagamento e contrato passam por você.
-
-## Agenda
-
-Segunda a sábado, 7h39 (horário de Brasília), como tarefa agendada do Claude.
-Cada execução escreve no "Diário da rotina" do painel e manda um resumo para o seu celular.
+- Enviar direct, WhatsApp, e-mail ou proposta. Quem envia é você.
+- Entrar em conta, criar conta ou contornar bloqueio de site.
+- Afirmar um defeito que não conferiu no dia, ou inventar fato sobre a loja.
+- Dar desconto ou prometer algo fora do campo "Condições" dos Ajustes.
+- Fechar negócio. Proposta aceita, pagamento e contrato passam por você.

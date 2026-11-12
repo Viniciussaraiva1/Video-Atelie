@@ -1,4 +1,40 @@
-# Ateliê Digital — filmes de venda
+# Ateliê Digital
+
+Vitrines para boutiques que vendem pelo Instagram. Este repositório guarda o site, a fábrica de
+prévias, a base de marca, a rotina de prospecção e os filmes de venda.
+
+Comece por [`docs/diagnostico.md`](docs/diagnostico.md): por que o Ateliê ainda não fechou e o que
+muda. O dia a dia está em [`docs/prospeccao.md`](docs/prospeccao.md).
+
+| Pasta | O que é |
+| --- | --- |
+| `index.html` | A página de venda, enxuta. É a raiz do site público |
+| `v/` | A prévia de vitrine que se monta pelo link (`?l=Nome+da+Loja&i=arroba&n=nicho`) |
+| `previa/` | Prévias com as fotos de cada loja, geradas por `scripts/previa.mjs` |
+| `marca/` | A base de marca: cor, letra, layout, componentes e as peças |
+| `insta/novo/` | Os posts novos, que mostram a vitrine de cada nicho |
+| `rotina/` | O texto das duas tarefas agendadas (diária e semanal) e os padrões |
+| `painel/` | O código do painel Caça-clientes |
+| `pagina/` | A página completa, com a mesa de montagem e todos os pacotes |
+| `boutique-rosa/` | A primeira vitrine demonstrativa, feita à mão |
+| `base/` | A base de design das vitrines (Zara, Riachuelo e Farm Rio) |
+| `src/`, `reels/`, `audio/` | Os filmes de venda e os Reels |
+
+```bash
+npm run site        # abre o site em http://localhost:8080
+```
+
+```bash
+npm run previa -- link "Eva Store" --ig evastoremaraba
+```
+
+```bash
+npm run marca       # refaz o cartão de link, a foto de perfil e os posts
+```
+
+O site vai ao ar pelo GitHub Pages: Settings → Pages → Deploy from a branch → pasta `/ (root)`.
+
+## Os filmes de venda
 
 Duas peças de vídeo que vendem o **Ateliê Digital** para boutiques que vendem
 pelo Instagram:

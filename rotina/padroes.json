@@ -1,0 +1,59 @@
+{
+ "config/pesos": {
+  "atualizado": "2026-11-12",
+  "whatsapp": 25,
+  "quebrada": 25,
+  "improvisado": 15,
+  "escala": 12,
+  "linktree": 8,
+  "regiao": 20,
+  "notaA": 10,
+  "conferido7": 5,
+  "nicho": {}
+ },
+ "config/variantes": {
+  "atualizado": "2026-11-12",
+  "lista": [
+   {
+    "id": "v1-pergunta",
+    "ativa": true,
+    "peso": 25,
+    "precisaSite": false,
+    "quando": "",
+    "criada": "2026-11-01",
+    "hipotese": "Linha de base: pede permissão antes de mostrar qualquer coisa.",
+    "modelo": "Oi, {loja}! Tudo bem? {gancho}\n\nEu monto vitrines para boutiques: uma página com as peças, o preço e o tamanho, para a cliente escolher sem esperar resposta no direct.\n\nMonto uma prévia grátis com 5 peças de vocês, em até 2 dias úteis e sem compromisso. Posso montar?"
+   },
+   {
+    "id": "v2-rascunho",
+    "ativa": true,
+    "peso": 30,
+    "precisaSite": true,
+    "quando": "",
+    "criada": "2026-11-12",
+    "hipotese": "Mostrar o rascunho já montado, com o nome da loja, rende mais resposta do que pedir permissão.",
+    "modelo": "Oi, {loja}! Tudo bem? {gancho}\n\nMontei um rascunho de como ficaria a vitrine de vocês, com peça, preço e tamanho na mesma tela: {previa}\n\nAs peças ali são de exemplo. Com 5 fotos de vocês eu troco e devolvo o link pronto em até 2 dias úteis, de graça. Querem ver com as peças de vocês?"
+   },
+   {
+    "id": "v3-defeito",
+    "ativa": true,
+    "peso": 25,
+    "precisaSite": true,
+    "quando": "quebrada",
+    "criada": "2026-11-12",
+    "hipotese": "Começar por um defeito conferido no link da própria loja dá motivo para responder hoje.",
+    "modelo": "Oi, {loja}! Tudo bem? Fui comprar pelo link da bio de vocês e {defeito}. Conferi hoje.\n\nEnquanto isso não volta, deixei montado um rascunho de vitrine para vocês: {previa}\n\nAs peças são de exemplo. Com 5 fotos de vocês eu troco em até 2 dias úteis, de graça. Posso montar?"
+   },
+   {
+    "id": "v4-curta",
+    "ativa": true,
+    "peso": 20,
+    "precisaSite": true,
+    "quando": "",
+    "criada": "2026-11-12",
+    "hipotese": "Duas linhas e o link rendem mais do que a mensagem explicada.",
+    "modelo": "Oi, {loja}! Montei um rascunho da vitrine de vocês, com peça, preço e tamanho na mesma tela: {previa}\n\nÉ grátis e sem compromisso. Querem que eu troque as peças de exemplo pelas de vocês?"
+   }
+  ]
+ }
+}
