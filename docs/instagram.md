@@ -3,6 +3,33 @@
 As peças ficam em `insta/` e saem de `node scripts/insta.mjs` (o mesmo motor tátil do filme).
 A página com o perfil montado, as legendas e as ideias está publicada como artefato privado.
 
+## Peças novas (novembro de 2026)
+
+As peças abaixo seguem a base de marca nova ([`marca/README.md`](../marca/README.md)): mostram a
+vitrine funcionando em vez do estilo tátil. Use estas no feed; as antigas ficam como arquivo.
+
+- `marca/perfil.png`: foto de perfil, a etiqueta com o A.
+- `insta/novo/post-1-previa.png` a `post-4-perguntas.png`: a oferta, o link da bio, o preço e as perguntas do direct.
+- `insta/novo/post-5-plus.png` a `post-9-modesta.png`: um post por nicho (plus size, festa, praia, fitness, evangélica), cada um com a vitrine daquele nicho.
+- `reels/vitrine-em-uso.mp4` (16 s, com a capa `capa-vitrine-em-uso.jpg`): uma compra inteira na vitrine, do toque ao Pix. É o Reel para fixar, e o vídeo para mandar no retorno pelo WhatsApp e no Status.
+
+Legenda do Reel "vitrine em uso":
+
+> Do toque ao pedido, sem esperar resposta.
+>
+> A cliente abre o link da bio, vê a peça e o preço, escolhe o tamanho e paga no Pix. Você só
+> separa a peça.
+>
+> Quer ver a sua loja assim? Comente VITRINE que eu monto a prévia com cinco peças suas, de graça.
+>
+> #boutique #modafeminina #lojavirtual #vendasnoinstagram
+
+Ordem sugerida para as duas primeiras semanas: post-1, o Reel, post-2, post-3, post-4 e depois um
+nicho por dia. A revisão semanal escreve três legendas novas todo domingo (ficam no painel, em
+`log/semana`).
+
+Tudo sai de `node scripts/marca.mjs` e `node scripts/reel-vitrine.mjs`.
+
 ## Peças
 
 - `perfil-papel.png` (recomendada), `perfil-cartaz.png`, `perfil-folha.png`: foto de perfil, 1080×1080.
