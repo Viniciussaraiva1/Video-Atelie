@@ -1,0 +1,164 @@
+/* =====================================================================
+   BASE DE MARCA DO ATELIÊ DIGITAL · novembro de 2026
+   Uma base só para o site, as peças do Instagram e o cartão de link.
+   (As vitrines das lojas seguem base/base-vitrine.css: lá quem manda é a loja.)
+
+   Ideia da base: a marca mostra a vitrine da cliente, não a si mesma.
+   Papel claro, tinta café, terracota só no que precisa ser visto,
+   a etiqueta de roupa como forma própria e o celular como moldura.
+   ===================================================================== */
+
+:root{
+  /* cor */
+  --papel:#FAF8F5; --papel-2:#F2EEE8; --cartao:#FFFFFF;
+  --tinta:#2B2623; --tinta-2:#3E3732; --apoio:#6B625C;      /* apoio nunca mais claro que isto: 5,6:1 no papel */
+  --linha:#E7E2DC; --linha-2:#D5CDC4;
+  --marca:#9A4A26; --marca-suave:#F4E8DF; --sobre-marca:#FFFFFF;   /* terracota: 6,1:1 no papel */
+  --botao:#2B2623; --sobre-botao:#FAF8F5;
+  --zap:#17694A; --sobre-zap:#FFFFFF;                        /* verde de conversa: 6,6:1 com branco */
+  --ok:#2F6B47; --aviso:#8A5A12; --aviso-fundo:#FBF0DA;
+  --sombra:0 1px 2px rgba(43,38,35,.05), 0 22px 44px -30px rgba(43,38,35,.38);
+
+  /* letra: Montserrat em tudo, títulos em peso 300; a didone itálica fica só na palavra da marca e num realce por título */
+  --letra:'Montserrat','Helvetica Neue',Arial,sans-serif;
+  --didone:'Bodoni Moda',Georgia,'Times New Roman',serif;
+  --t-1:clamp(34px,8.8vw,62px);      /* título da página */
+  --t-2:clamp(26px,5.8vw,40px);      /* título de seção */
+  --t-3:clamp(19px,4.4vw,22px);      /* título de cartão */
+  --corpo:17px; --pequeno:14px; --rotulo:11.5px;
+
+  /* medida: escala de 4 */
+  --e-1:4px; --e-2:8px; --e-3:12px; --e-4:16px; --e-5:24px; --e-6:32px; --e-7:48px; --e-8:72px; --e-9:104px;
+  --margem:20px; --largura:1120px; --coluna:60ch;
+  --raio:14px; --raio-g:24px; --pilula:999px;
+  --toque:48px;                       /* altura mínima de tudo que se toca */
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --papel:#151210; --papel-2:#1C1815; --cartao:#211C18;
+    --tinta:#F3EEE8; --tinta-2:#DDD5CC; --apoio:#B5ABA2;
+    --linha:#352E29; --linha-2:#4A413A;
+    --marca:#E0976A; --marca-suave:#38241A; --sobre-marca:#1E1610;
+    --botao:#F3EEE8; --sobre-botao:#1A1613;
+    --zap:#3FAE7F; --sobre-zap:#0E1A14;
+    --ok:#7BBF93; --aviso:#D9A243; --aviso-fundo:#3A2C12;
+    --sombra:0 1px 2px rgba(0,0,0,.5), 0 22px 44px -30px rgba(0,0,0,.9);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#151210; --papel-2:#1C1815; --cartao:#211C18;
+  --tinta:#F3EEE8; --tinta-2:#DDD5CC; --apoio:#B5ABA2;
+  --linha:#352E29; --linha-2:#4A413A;
+  --marca:#E0976A; --marca-suave:#38241A; --sobre-marca:#1E1610;
+  --botao:#F3EEE8; --sobre-botao:#1A1613;
+  --zap:#3FAE7F; --sobre-zap:#0E1A14;
+  --ok:#7BBF93; --aviso:#D9A243; --aviso-fundo:#3A2C12;
+  --sombra:0 1px 2px rgba(0,0,0,.5), 0 22px 44px -30px rgba(0,0,0,.9);
+  color-scheme:dark;
+}
+
+/* ---------- chão ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--papel);color:var(--tinta);font:400 var(--corpo)/1.6 var(--letra);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg,iframe{max-width:100%;display:block}
+a{color:inherit;text-underline-offset:3px}
+h1,h2,h3,p,figure,ol,ul{margin:0}
+:focus-visible{outline:2px solid var(--marca);outline-offset:3px;border-radius:4px}
+
+/* ---------- letra ---------- */
+.t-1{font-size:var(--t-1);font-weight:300;line-height:1.06;letter-spacing:-.022em;text-wrap:balance}
+.t-2{font-size:var(--t-2);font-weight:300;line-height:1.12;letter-spacing:-.016em;text-wrap:balance}
+.t-3{font-size:var(--t-3);font-weight:500;line-height:1.25;letter-spacing:-.005em}
+.t-1 em,.t-2 em{font-family:var(--didone);font-style:italic;font-weight:500;color:var(--marca);letter-spacing:-.01em}
+.rotulo{font-size:var(--rotulo);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--apoio)}
+.apoio{color:var(--apoio)}
+.pequeno{font-size:var(--pequeno);line-height:1.5}
+.medida{max-width:var(--coluna)}
+.marca-letra{font-weight:300;letter-spacing:.01em;white-space:nowrap}
+.marca-letra em{font-family:var(--didone);font-style:italic;font-weight:500;color:var(--marca)}
+
+/* ---------- funções de layout ----------
+   .pagina  largura máxima com margem lateral
+   .secao   respiro vertical de seção
+   .pilha   coluna com vão (--vao)
+   .linha   fila que quebra, com vão (--vao)
+   .grade   colunas automáticas a partir de uma largura mínima (--min)
+   .dupla   duas colunas a partir de 900 px; .inverte troca a ordem só no computador */
+.pagina{width:min(100% - 2*var(--margem),var(--largura));margin-inline:auto}
+.secao{padding-block:clamp(var(--e-7),9vw,var(--e-9))}
+.secao.faixa{background:var(--papel-2)}
+.pilha{display:flex;flex-direction:column;gap:var(--vao,var(--e-4))}
+.linha{display:flex;flex-wrap:wrap;align-items:center;gap:var(--vao,var(--e-3))}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--min,260px)),1fr));gap:var(--vao,var(--e-4))}
+.dupla{display:grid;gap:var(--vao,var(--e-6));align-items:center}
+@media (min-width:900px){
+  .dupla{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:var(--vao,var(--e-8))}
+  .dupla.inverte>:first-child{order:2}
+}
+.centro{text-align:center;justify-items:center;align-items:center}
+.centro .medida{margin-inline:auto}
+
+/* ---------- botão: em pílula, um principal por tela ---------- */
+.botao{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--toque);padding:13px 26px;border-radius:var(--pilula);
+  border:1px solid var(--botao);background:var(--botao);color:var(--sobre-botao);font:500 16px/1.2 var(--letra);text-decoration:none;cursor:pointer;text-align:center;transition:transform .15s ease,box-shadow .15s ease}
+.botao:hover{transform:translateY(-1px);box-shadow:var(--sombra)}
+.botao.zap{background:var(--zap);border-color:var(--zap);color:var(--sobre-zap)}
+.botao.claro{background:transparent;color:var(--tinta);border-color:var(--linha-2)}
+.botao.largo{width:100%}
+.botao svg{width:20px;height:20px;flex:none}
+.elo{font-weight:500;text-decoration:underline;text-decoration-color:var(--linha-2)}
+.elo:hover{text-decoration-color:currentColor}
+
+/* ---------- etiqueta: a forma da marca. Preço, prazo e condição sempre dentro dela ---------- */
+.etiqueta{position:relative;display:inline-flex;align-items:center;min-height:34px;padding:6px 14px 6px 30px;background:var(--marca-suave);color:var(--tinta);
+  border-radius:6px;font-size:13.5px;font-weight:500;line-height:1.25;white-space:nowrap;
+  clip-path:polygon(13px 0,100% 0,100% 100%,13px 100%,0 50%)}
+.etiqueta::before{content:"";position:absolute;left:14px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;border:1.5px solid var(--marca)}
+.etiqueta.cheia{background:var(--marca);color:var(--sobre-marca)}
+.etiqueta.cheia::before{border-color:var(--sobre-marca)}
+.etiqueta b{font-weight:600}
+
+/* ---------- celular: a moldura onde a vitrine aparece ---------- */
+.celular{position:relative;width:min(100%,318px);aspect-ratio:318/640;margin-inline:auto;padding:26px 9px 10px;border-radius:44px;background:var(--tinta);box-shadow:var(--sombra),inset 0 0 0 1.5px rgba(255,255,255,.14)}
+.celular::before{content:"";position:absolute;top:10px;left:50%;width:54px;height:6px;margin-left:-27px;border-radius:6px;background:rgba(255,255,255,.2)}
+.celular>iframe,.celular>img,.celular>.tela{width:100%;height:100%;border:0;border-radius:14px 14px 35px 35px;background:var(--cartao);object-fit:cover;overflow:hidden}
+
+/* ---------- cartão, passos, prova, assinatura ---------- */
+.cartao{background:var(--cartao);border:1px solid var(--linha);border-radius:var(--raio-g);padding:clamp(22px,4.6vw,36px)}
+.cartao.destaque{border-color:var(--tinta);box-shadow:var(--sombra)}
+.passos{list-style:none;padding:0;counter-reset:passo;display:grid;gap:var(--e-5)}
+.passos>li{counter-increment:passo;display:grid;grid-template-columns:44px 1fr;gap:var(--e-4);align-items:start}
+.passos>li::before{content:counter(passo);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--marca);color:var(--marca);font:500 20px/1 var(--didone)}
+.lista{list-style:none;padding:0;display:grid;gap:10px}
+.lista>li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.lista>li::before{content:"";width:22px;height:22px;margin-top:2px;border-radius:50%;background:var(--marca-suave) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M6.5 11.4l3 3 6-6.6' fill='none' stroke='%239A4A26' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/22px no-repeat}
+.prova{border-left:2px solid var(--marca);padding:4px 0 4px var(--e-5);font-size:19px;font-weight:300;line-height:1.5}
+.prova cite{display:block;margin-top:10px;font-size:var(--pequeno);font-style:normal;font-weight:500;color:var(--apoio)}
+.assinatura{display:grid;grid-template-columns:64px 1fr;gap:var(--e-4);align-items:center}
+.assinatura .retrato{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--marca-suave);color:var(--marca);display:grid;place-items:center;font:500 26px/1 var(--didone);overflow:hidden}
+
+/* ---------- dúvidas ---------- */
+.duvidas{border-top:1px solid var(--linha)}
+.duvidas details{border-bottom:1px solid var(--linha)}
+.duvidas summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:var(--e-4);align-items:center;min-height:60px;padding:14px 0;font-weight:500}
+.duvidas summary::-webkit-details-marker{display:none}
+.duvidas summary::after{content:"+";font:300 26px/1 var(--letra);color:var(--marca);flex:none;transition:transform .2s ease}
+.duvidas details[open] summary::after{transform:rotate(45deg)}
+.duvidas details p{padding:0 0 20px;color:var(--apoio);max-width:var(--coluna)}
+
+/* ---------- topo, aviso e barra fixa do celular ---------- */
+.aviso{background:var(--tinta);color:var(--papel);font-size:13.5px;text-align:center;padding:9px var(--margem);line-height:1.4}
+.aviso a{font-weight:600}
+.topo{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--papel) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--linha)}
+.topo .pagina{display:flex;align-items:center;justify-content:space-between;gap:var(--e-4);min-height:60px}
+.topo .marca-letra{font-size:21px;text-decoration:none}
+.topo .botao{min-height:40px;padding:9px 18px;font-size:15px}
+.barra-fixa{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px var(--margem) calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--papel) 94%,transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--linha);transform:translateY(110%);transition:transform .25s ease}
+.barra-fixa.visivel{transform:none}
+@media (min-width:900px){.barra-fixa{display:none}}
+.rodape{padding:var(--e-7) 0 calc(var(--e-8) + env(safe-area-inset-bottom));border-top:1px solid var(--linha);color:var(--apoio);font-size:var(--pequeno)}

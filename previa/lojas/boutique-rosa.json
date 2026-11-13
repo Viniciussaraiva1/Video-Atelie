@@ -1,0 +1,144 @@
+{
+  "nome": "Boutique Rosa",
+  "ig": "bout_rosa",
+  "whatsapp": "",
+  "cor": "#9C7A45",
+  "ref": "ig-bout_rosa",
+  "logo": {
+    "linha": "BOUTIQUE",
+    "destaque": "Rosa"
+  },
+  "novidades": "2026-11-03",
+  "freteGratis": 399,
+  "tamanhos": [
+    "P",
+    "M",
+    "G",
+    "GG"
+  ],
+  "chamada": [
+    "Chegaram os ",
+    "longos",
+    " da estação"
+  ],
+  "texto": "Listras finas, amarelo manteiga e alfaiataria em tons de café. Escolha, pague no Pix ou no cartão e retire na loja ou receba em casa.",
+  "historia": "Moda feminina para o trabalho, o fim de semana e as ocasiões especiais, na loja física e agora aqui, com compra direta.",
+  "vantagens": [
+    "3x sem juros no cartão",
+    "5% de desconto no Pix",
+    "Retire grátis na loja",
+    "Primeira troca grátis"
+  ],
+  "pecas": [
+    {
+      "id": "listrado",
+      "tipo": "Vestidos",
+      "nome": "Vestido Longo Listrado Frente Única",
+      "preco": 219,
+      "selo": "Novidade",
+      "esgotados": [],
+      "desc": "Vestido longo e reto em listras finas, frente única com detalhe dourado no pescoço e fenda lateral.",
+      "cores": [
+        {
+          "nome": "Listrado caramelo",
+          "hex": "linear-gradient(90deg,#8E3F2C 50%,#F4EAE0 50%) 0 0/4px 100%",
+          "img": "../../boutique-rosa/img/listrado.jpg",
+          "alt": "Modelo com vestido longo listrado caramelo e off-white de frente única"
+        }
+      ]
+    },
+    {
+      "id": "amarelo",
+      "tipo": "Vestidos",
+      "nome": "Vestido Longo Gola Alta",
+      "preco": 199,
+      "selo": "Novidade",
+      "esgotados": [
+        "GG"
+      ],
+      "desc": "Vestido longo de malha com gola alta e manga curta, cintura baixa marcada e saia franzida.",
+      "cores": [
+        {
+          "nome": "Amarelo manteiga",
+          "hex": "#F1E7A2",
+          "img": "../../boutique-rosa/img/amarelo.jpg",
+          "alt": "Modelo com vestido longo amarelo manteiga de gola alta"
+        }
+      ]
+    },
+    {
+      "id": "colete-fivela",
+      "tipo": "Conjuntos",
+      "nome": "Conjunto Colete Fivela e Pantalona",
+      "preco": 289,
+      "selo": "",
+      "esgotados": [],
+      "desc": "Colete alongado sem mangas, com gola de alfaiataria e faixa com fivela, e calça pantalona de cintura alta no mesmo tecido.",
+      "cores": [
+        {
+          "nome": "Nude",
+          "hex": "#E3CDB8",
+          "img": "../../boutique-rosa/img/nude.jpg",
+          "alt": "Modelo com colete nude de faixa e fivela e calça pantalona"
+        }
+      ]
+    },
+    {
+      "id": "conjunto-colete",
+      "tipo": "Conjuntos",
+      "nome": "Conjunto Colete e Calça Alfaiataria",
+      "preco": 299,
+      "selo": "2 cores",
+      "esgotados": [],
+      "desc": "Colete de três botões com decote em V e calça reta de cintura alta, com pesponto na frente e barra dobrada.",
+      "cores": [
+        {
+          "nome": "Café",
+          "hex": "#4B3027",
+          "img": "../../boutique-rosa/img/colete-cafe.jpg",
+          "alt": "Modelo com colete e calça café sobre camisa branca"
+        },
+        {
+          "nome": "Off-white",
+          "hex": "#F1ECE3",
+          "img": "../../boutique-rosa/img/colete-off.jpg",
+          "alt": "Modelo com colete e calça off-white"
+        }
+      ]
+    },
+    {
+      "id": "vestido-babado",
+      "tipo": "Vestidos",
+      "nome": "Vestido Barra de Babado",
+      "preco": 169,
+      "selo": "",
+      "esgotados": [],
+      "desc": "Vestido curto de alça larga e decote reto, ajustado ao corpo, com babado na barra.",
+      "cores": [
+        {
+          "nome": "Café",
+          "hex": "#5B392D",
+          "img": "../../boutique-rosa/img/cafe-vestido.jpg",
+          "alt": "Modelo com vestido curto café de barra de babado"
+        }
+      ]
+    },
+    {
+      "id": "vestido-camadas",
+      "tipo": "Vestidos",
+      "nome": "Vestido Saia em Camadas",
+      "preco": 159,
+      "selo": "",
+      "esgotados": [],
+      "desc": "Vestido curto de alcinha, com faixa marcando a cintura e saia rodada em duas camadas.",
+      "cores": [
+        {
+          "nome": "Rosa",
+          "hex": "#F2B6C9",
+          "img": "../../boutique-rosa/img/rosa.jpg",
+          "alt": "Modelo com vestido curto rosa de saia rodada em camadas"
+        }
+      ]
+    }
+  ]
+}
