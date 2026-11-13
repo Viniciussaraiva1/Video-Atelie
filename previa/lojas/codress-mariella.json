@@ -4,10 +4,10 @@
   "cor": "#8A5A44",
   "ref": "ig-codressmariella",
   "nicho": "festa",
-  "modelo": "mariella",
+  "modelo": "codress",
   "logo": {
-    "linha": "CO-DRESS BY",
-    "destaque": "Mariella"
+    "destaque": "CO-DRESS",
+    "por": "Mariella"
   },
   "novidades": "2026-11-13",
   "freteGratis": 599,
@@ -32,19 +32,27 @@
     "Primeira troca grátis"
   ],
   "parcelas": 6,
-  "titulo": "CO DRESS - Vestidos de Festa",
-  "banner": [
-    "Temporada de festas",
-    "Shop now"
-  ],
+  "titulo": "Vestidos de festa",
+  "banner": {
+    "sobre": "Coleção festa",
+    "titulo": [
+      "Temporada ",
+      "de festas"
+    ],
+    "botao": "Shop now"
+  },
   "convite": {
     "titulo": "Gostou? Esta vitrine vai ao ar em 7 dias úteis",
-    "texto": "No mariella.com.br, a página CO DRESS - Vestidos de Festa ainda aparece “Em construção”. Esta prévia mostra essa página pronta, no visual do seu site: peça, cor, numeração e pagamento na mesma tela. Para ir ao ar faltam os preços, as numerações e o número do WhatsApp que recebe os pedidos."
+    "texto": "No mariella.com.br, a página CO DRESS - Vestidos de Festa ainda aparece “Em construção”. Esta prévia mostra a CO-DRESS com vitrine própria de moda festa, sem perder a assinatura da Mariella: vestido, cor, numeração, ocasião e pagamento na mesma tela. Para ir ao ar faltam os preços, as numerações e o número do WhatsApp que recebe os pedidos."
   },
   "pecas": [
     {
       "id": "corset-rosa",
       "tipo": "Longos",
+      "ocasioes": [
+        "Madrinha",
+        "Formatura"
+      ],
       "nome": "Vestido Longo Corset Tomara que Caia",
       "preco": 2597,
       "selo": "Novidade",
@@ -62,6 +70,10 @@
     {
       "id": "tule-coral",
       "tipo": "Longos",
+      "ocasioes": [
+        "Formatura",
+        "Madrinha"
+      ],
       "nome": "Vestido Longo de Tule em Camadas",
       "preco": 2997,
       "selo": "Novidade",
@@ -81,6 +93,10 @@
     {
       "id": "tafeta-pink",
       "tipo": "Longos",
+      "ocasioes": [
+        "Madrinha",
+        "Convidada"
+      ],
       "nome": "Vestido Longo de Tafetá Drapeado",
       "preco": 2397,
       "selo": "",
@@ -98,6 +114,10 @@
     {
       "id": "capa-cafe",
       "tipo": "Colunas",
+      "ocasioes": [
+        "Black tie",
+        "Convidada"
+      ],
       "nome": "Vestido Coluna com Capa e Fenda",
       "preco": 2297,
       "selo": "",
@@ -115,6 +135,10 @@
     {
       "id": "babado-manteiga",
       "tipo": "Colunas",
+      "ocasioes": [
+        "Convidada",
+        "Formatura"
+      ],
       "nome": "Vestido Sereia com Babado em Flor",
       "preco": 2797,
       "selo": "",

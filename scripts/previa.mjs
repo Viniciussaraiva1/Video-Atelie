@@ -13,8 +13,8 @@
         node scripts/previa.mjs gera previa/lojas/eva-store.json       # escreve previa/eva-store/index.html
         node scripts/previa.mjs gera --todas
 
-      Loja que já tem site: "modelo": "mariella" no JSON faz a prévia sair no desenho do site dela
-      (previa/modelos/mariella.html). "parcelas": 6 troca o parcelamento sem juros, que por padrão é 3.
+      Loja que já tem site ou identidade própria: "modelo": "codress" no JSON faz a prévia sair no desenho
+      de previa/modelos/codress.html. "parcelas": 6 troca o parcelamento sem juros, que por padrão é 3.
 
    O endereço público sai de SITE (variável de ambiente) ou do padrão abaixo. */
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
