@@ -454,7 +454,7 @@ legend{font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppe
       <fieldset>
         <legend>Pagamento</legend>
         <label class="opcao"><input type="radio" name="pag" value="pix" checked><span><b>Pix</b><span>5% de desconto · aprovação na hora</span></span><span class="vl" id="c-pix-vl"></span></label>
-        <label class="opcao"><input type="radio" name="pag" value="cartao"><span><b>Cartão de crédito</b><span>Em até 3x sem juros</span></span><span class="vl" id="c-cartao-vl"></span></label>
+        <label class="opcao"><input type="radio" name="pag" value="cartao"><span><b>Cartão de crédito</b><span id="c-parc-rot">Em até 3x sem juros</span></span><span class="vl" id="c-cartao-vl"></span></label>
         <div id="c-cartao-box" hidden>
           <label class="campo">Parcelas<select id="c-parc"></select></label>
           <p class="nota" style="margin:8px 0 0">Na versão final, os dados do cartão são digitados na tela segura do intermediador de pagamento. Nesta demonstração, nenhum dado de cartão é pedido.</p>
@@ -498,6 +498,7 @@ var EXEMPLO = !P.pecas;                 /* true = peças desenhadas, ainda sem a
 var NUMERO = String(P.whatsapp || "").replace(/\D/g, "");
 var NOVIDADES = P.novidades ? new Date(P.novidades + "T12:00:00") : new Date();
 var FRETE_GRATIS = P.freteGratis || 399;
+var PARCELAS = Math.min(12, Math.max(1, parseInt(P.parcelas, 10) || 3));   /* em quantas vezes sem juros a loja parcela */
 
 /* ----- croquis: as peças de exemplo são desenhadas aqui, sem banco de imagens ----- */
 var TINTA = "#171614";
@@ -695,6 +696,8 @@ function montaLoja() {
     $("dona-zap").textContent = "Quero colocar no ar";
     document.querySelector(".passos-dona").hidden = true;
   } else if (LOJA !== "Sua Loja") $("dona-t").textContent = "Esta pode ser a vitrine da " + LOJA;
+  /* ?e=1: a vitrine aparece dentro da moldura de celular da página do Ateliê, sem a faixa nem o convite */
+  if (Q.get("e")) { demo.hidden = true; $("dona").hidden = true; }
 }
 
 /* ===== estado ===== */
@@ -705,7 +708,7 @@ var numPedido = 1047;
 
 function $(id) { return document.getElementById(id); }
 function brl(v) { return "R$ " + v.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
-function parcela(v) { return "ou 3x de " + brl(v / 3) + " sem juros"; }
+function parcela(v) { return "ou " + PARCELAS + "x de " + brl(v / PARCELAS) + " sem juros"; }
 function peca(id) { for (var i = 0; i < PECAS.length; i++) if (PECAS[i].id === id) return PECAS[i]; }
 function linkZap(t) { return (NUMERO ? "https://wa.me/" + NUMERO : "https://wa.me/") + "?text=" + encodeURIComponent(t); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -858,8 +861,9 @@ function atualizaResumo() {
   var semDesc = t.sub + (valorFrete() || 0);
   $("c-pix-vl").textContent = brl(semDesc - t.sub * .05);
   $("c-cartao-vl").textContent = brl(semDesc);
-  var sel = $("c-parc"), atualP = sel.value || "3"; sel.innerHTML = "";
-  [1, 2, 3].forEach(function (n) { var o = document.createElement("option"); o.value = n; o.textContent = n + "x de " + brl(semDesc / n) + (n > 1 ? " sem juros" : ""); sel.appendChild(o); });
+  var sel = $("c-parc"), atualP = sel.value || String(PARCELAS); sel.innerHTML = "";
+  for (var n = 1; n <= PARCELAS; n++) { var o = document.createElement("option"); o.value = n; o.textContent = n + "x de " + brl(semDesc / n) + (n > 1 ? " sem juros" : ""); sel.appendChild(o); }
+  $("c-parc-rot").textContent = "Em até " + PARCELAS + "x sem juros";
   sel.value = atualP;
   $("c-pagar").textContent = pagamento() === "pix" ? "Gerar Pix de " + brl(t.total) : "Pagar " + brl(t.total);
   var et = document.querySelectorAll(".etapas span");

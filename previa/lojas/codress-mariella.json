@@ -4,29 +4,132 @@
   "cor": "#8A5A44",
   "ref": "ig-codressmariella",
   "nicho": "festa",
-  "logo": { "linha": "CO-DRESS BY", "destaque": "Mariella" },
+  "modelo": "mariella",
+  "logo": {
+    "linha": "CO-DRESS BY",
+    "destaque": "Mariella"
+  },
   "novidades": "2026-11-13",
   "freteGratis": 599,
-  "tamanhos": ["P", "M", "G", "GG"],
-  "chamada": ["Os ", "longos", " da temporada de festas"],
-  "texto": "Do rosa ao café, o vestido da sua festa com cor, tamanho e preço na mesma tela. De Florianópolis para todo o Brasil.",
+  "tamanhos": [
+    "36",
+    "38",
+    "40",
+    "42",
+    "44"
+  ],
+  "chamada": [
+    "Os ",
+    "longos",
+    " da temporada de festas"
+  ],
+  "texto": "De Florianópolis para todo o Brasil",
   "historia": "Moda festa escolhida a dedo, de Florianópolis para todo o Brasil. Agora com vitrine própria: você escolhe o modelo e já chega no WhatsApp decidida.",
-  "vantagens": ["3x sem juros no cartão", "5% de desconto no Pix", "Envio para todo o Brasil", "Primeira troca grátis"],
+  "vantagens": [
+    "6x sem juros no cartão",
+    "5% de desconto no Pix",
+    "Envio para todo o Brasil",
+    "Primeira troca grátis"
+  ],
+  "parcelas": 6,
+  "titulo": "CO DRESS - Vestidos de Festa",
+  "banner": [
+    "Temporada de festas",
+    "Shop now"
+  ],
+  "convite": {
+    "titulo": "Gostou? Esta vitrine vai ao ar em 7 dias úteis",
+    "texto": "No mariella.com.br, a página CO DRESS - Vestidos de Festa ainda aparece “Em construção”. Esta prévia mostra essa página pronta, no visual do seu site: peça, cor, numeração e pagamento na mesma tela. Para ir ao ar faltam os preços, as numerações e o número do WhatsApp que recebe os pedidos."
+  },
   "pecas": [
-    { "id": "corset-rosa", "tipo": "Longos", "nome": "Vestido Longo Corset Tomara que Caia", "preco": 489, "selo": "Novidade", "esgotados": [],
+    {
+      "id": "corset-rosa",
+      "tipo": "Longos",
+      "nome": "Vestido Longo Corset Tomara que Caia",
+      "preco": 2597,
+      "selo": "Novidade",
+      "esgotados": [],
       "desc": "Corpete estruturado com recortes verticais, cintura baixa e saia ampla franzida até o chão.",
-      "cores": [{ "nome": "Rosa antigo", "hex": "#D98AA0", "img": "img/corset-rosa.jpg", "alt": "Modelo com vestido longo rosa tomara que caia, de corpete estruturado e saia ampla" }] },
-    { "id": "tule-coral", "tipo": "Longos", "nome": "Vestido Longo de Tule em Camadas", "preco": 629, "selo": "Novidade", "esgotados": ["GG"],
+      "cores": [
+        {
+          "nome": "Rosa antigo",
+          "hex": "#D98AA0",
+          "img": "img/corset-rosa.jpg",
+          "alt": "Modelo com vestido longo rosa tomara que caia, de corpete estruturado e saia ampla"
+        }
+      ]
+    },
+    {
+      "id": "tule-coral",
+      "tipo": "Longos",
+      "nome": "Vestido Longo de Tule em Camadas",
+      "preco": 2997,
+      "selo": "Novidade",
+      "esgotados": [
+        "44"
+      ],
       "desc": "Ombro a ombro drapeado, flor na cintura e saia de tule em camadas de babados.",
-      "cores": [{ "nome": "Coral", "hex": "#F0A383", "img": "img/tule-coral.jpg", "alt": "Modelo sentada em escadaria com vestido longo coral de tule em camadas, ombro a ombro" }] },
-    { "id": "tafeta-pink", "tipo": "Longos", "nome": "Vestido Longo de Tafetá Drapeado", "preco": 459, "selo": "", "esgotados": [],
+      "cores": [
+        {
+          "nome": "Coral",
+          "hex": "#F0A383",
+          "img": "img/tule-coral.jpg",
+          "alt": "Modelo sentada em escadaria com vestido longo coral de tule em camadas, ombro a ombro"
+        }
+      ]
+    },
+    {
+      "id": "tafeta-pink",
+      "tipo": "Longos",
+      "nome": "Vestido Longo de Tafetá Drapeado",
+      "preco": 2397,
+      "selo": "",
+      "esgotados": [],
       "desc": "Tomara que caia com busto drapeado em faixas cruzadas e saia evasê de tafetá.",
-      "cores": [{ "nome": "Pink", "hex": "#D4186C", "img": "img/tafeta-pink.jpg", "alt": "Modelo com vestido longo pink de tafetá, tomara que caia com busto drapeado" }] },
-    { "id": "capa-cafe", "tipo": "Colunas", "nome": "Vestido Coluna com Capa e Fenda", "preco": 419, "selo": "", "esgotados": [],
+      "cores": [
+        {
+          "nome": "Pink",
+          "hex": "#D4186C",
+          "img": "img/tafeta-pink.jpg",
+          "alt": "Modelo com vestido longo pink de tafetá, tomara que caia com busto drapeado"
+        }
+      ]
+    },
+    {
+      "id": "capa-cafe",
+      "tipo": "Colunas",
+      "nome": "Vestido Coluna com Capa e Fenda",
+      "preco": 2297,
+      "selo": "",
+      "esgotados": [],
       "desc": "Tomara que caia ajustado em malha fluida, com capa que sai do pescoço e fenda lateral.",
-      "cores": [{ "nome": "Café", "hex": "#4A2B24", "img": "img/capa-cafe.jpg", "alt": "Modelo com vestido longo café ajustado, com capa nos ombros e fenda lateral" }] },
-    { "id": "babado-manteiga", "tipo": "Colunas", "nome": "Vestido Sereia com Babado em Flor", "preco": 529, "selo": "", "esgotados": ["P"],
+      "cores": [
+        {
+          "nome": "Café",
+          "hex": "#4A2B24",
+          "img": "img/capa-cafe.jpg",
+          "alt": "Modelo com vestido longo café ajustado, com capa nos ombros e fenda lateral"
+        }
+      ]
+    },
+    {
+      "id": "babado-manteiga",
+      "tipo": "Colunas",
+      "nome": "Vestido Sereia com Babado em Flor",
+      "preco": 2797,
+      "selo": "",
+      "esgotados": [
+        "36"
+      ],
       "desc": "Tomara que caia drapeado, com babado em flor do busto ao quadril e saia fluida com leve cauda.",
-      "cores": [{ "nome": "Amarelo manteiga", "hex": "#F2E79A", "img": "img/babado-manteiga.jpg", "alt": "Modelo com vestido longo amarelo manteiga, tomara que caia com babado em flor" }] }
+      "cores": [
+        {
+          "nome": "Amarelo manteiga",
+          "hex": "#F2E79A",
+          "img": "img/babado-manteiga.jpg",
+          "alt": "Modelo com vestido longo amarelo manteiga, tomara que caia com babado em flor"
+        }
+      ]
+    }
   ]
 }

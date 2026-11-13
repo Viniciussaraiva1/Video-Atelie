@@ -13,6 +13,9 @@
         node scripts/previa.mjs gera previa/lojas/eva-store.json       # escreve previa/eva-store/index.html
         node scripts/previa.mjs gera --todas
 
+      Loja que já tem site: "modelo": "mariella" no JSON faz a prévia sair no desenho do site dela
+      (previa/modelos/mariella.html). "parcelas": 6 troca o parcelamento sem juros, que por padrão é 3.
+
    O endereço público sai de SITE (variável de ambiente) ou do padrão abaixo. */
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join, basename, extname } from 'node:path';
@@ -53,17 +56,43 @@ function nova(nome, o) {
   console.log('Criado ' + arq + (fotos.length ? ' com ' + fotos.length + ' fotos' : '') + '\nFotos em: ' + join(pasta, 'img') + '\nDepois: node scripts/previa.mjs gera previa/lojas/' + s + '.json');
 }
 
+/* Modelo próprio de uma loja (previa/modelos/<nome>.html): a prévia segue o desenho do site que a loja já tem.
+   O modelo traz o cabeçalho, a vitrine e o rodapé; a ficha, a sacola e a compra vêm de v/index.html,
+   para as duas páginas venderem do mesmo jeito. Cada marca @... do modelo recebe um trecho da página-base. */
+function comModelo(nome, base, dados) {
+  const arq = join(RAIZ, 'previa', 'modelos', slug(nome) + '.html');
+  if (!existsSync(arq)) throw new Error('modelo não encontrado: ' + arq);
+  const trecho = (de, ate) => { const a = base.indexOf(de), b = base.indexOf(ate, a + 1); if (a < 0 || b < 0) throw new Error('v/index.html mudou: não achei o trecho entre "' + de + '" e "' + ate + '"'); return base.slice(a, b); };
+  const partes = {
+    '/*@nucleo:css*/': trecho('/* camadas: ficha, sacola e compra */', '/* ===== prévia: convite para a dona da loja ===== */'),
+    '<!--@nucleo:html-->': trecho('<!-- ficha da peça -->', '<script>\n/* ===== dados da vitrine'),
+    '/*@nucleo:js*/': trecho('/* ===== estado ===== */', 'montaLoja();'),
+    '<!--@dados-->': dados,
+  };
+  let html = readFileSync(arq, 'utf8');
+  for (const [marca, texto] of Object.entries(partes)) {
+    if (html.split(marca).length !== 2) throw new Error(arq + ': a marca ' + marca + ' deve aparecer uma vez');
+    html = html.replace(marca, () => texto);
+  }
+  return html;
+}
+
 function gera(arq) {
   const d = JSON.parse(readFileSync(arq, 'utf8')), s = slug(basename(arq, '.json')), pasta = join(RAIZ, 'previa', s);
   if (!d.nome || !Array.isArray(d.pecas) || !d.pecas.length) throw new Error(arq + ': faltam "nome" ou "pecas"');
   const faltam = d.pecas.flatMap(p => p.cores.map(c => c.img)).filter(i => !/^(https?:|data:)/.test(i) && !existsSync(join(pasta, i)));
   if (faltam.length) console.warn('  aviso: fotos que ainda não estão na pasta: ' + faltam.join(', '));
   for (const k of ['texto', 'historia', 'cor', 'whatsapp']) if (!d[k]) delete d[k];
+  const modelo = d.modelo; delete d.modelo;
+  const dados = '<script>window.PREVIA = ' + JSON.stringify(d).replace(/</g, '\\u003c') + ';</script>\n';   /* "<" não pode aparecer dentro do JSON embutido na página */
   let html = readFileSync(join(RAIZ, 'v', 'index.html'), 'utf8');
-  const marco = html.lastIndexOf('<script>', html.indexOf('/* ===== dados da prévia'));
-  if (marco < 0) throw new Error('v/index.html mudou: não achei o início dos dados');
-  /* "<" não pode aparecer dentro do JSON embutido na página */
-  html = (html.slice(0, marco) + '<script>window.PREVIA = ' + JSON.stringify(d).replace(/</g, '\\u003c') + ';</script>\n' + html.slice(marco)).replaceAll('href="../"', 'href="../../"');
+  if (modelo) html = comModelo(modelo, html, dados);
+  else {
+    const marco = html.lastIndexOf('<script>', html.indexOf('/* ===== dados da prévia'));
+    if (marco < 0) throw new Error('v/index.html mudou: não achei o início dos dados');
+    html = html.slice(0, marco) + dados + html.slice(marco);
+  }
+  html = html.replaceAll('href="../"', 'href="../../"');
   mkdirSync(pasta, { recursive: true });
   writeFileSync(join(pasta, 'index.html'), html);
   console.log(d.nome + ' → ' + SITE + 'previa/' + s + '/');

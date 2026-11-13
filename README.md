@@ -10,7 +10,7 @@ muda. O dia a dia está em [`docs/prospeccao.md`](docs/prospeccao.md).
 | --- | --- |
 | `index.html` | A página de venda, enxuta. É a raiz do site público |
 | `v/` | A prévia de vitrine que se monta pelo link (`?l=Nome+da+Loja&i=arroba&n=nicho`) |
-| `previa/` | Prévias com as fotos de cada loja, geradas por `scripts/previa.mjs` |
+| `previa/` | Prévias com as fotos de cada loja, geradas por `scripts/previa.mjs`. Em `previa/modelos/` ficam os modelos de lojas que já têm site: a prévia sai no desenho do site delas (`"modelo": "mariella"` no JSON da loja) |
 | `marca/` | A base de marca: cor, letra, layout, componentes e as peças |
 | `insta/novo/` | Os posts novos, que mostram a vitrine de cada nicho |
 | `rotina/` | O texto das duas tarefas agendadas (diária e semanal) e os padrões |
